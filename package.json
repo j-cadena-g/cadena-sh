@@ -1,0 +1,81 @@
+{
+  "name": "cadena-sh",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Source for james.cadena.sh — personal site for James Cadena, Network & Security Engineer.",
+  "homepage": "https://james.cadena.sh",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/j-cadena-g/cadena-sh.git"
+  },
+  "bugs": {
+    "url": "https://github.com/j-cadena-g/cadena-sh/issues"
+  },
+  "author": {
+    "name": "James Cadena",
+    "url": "https://james.cadena.sh"
+  },
+  "license": "MIT",
+  "keywords": [
+    "portfolio",
+    "nextjs",
+    "tailwindcss",
+    "shadcn-ui",
+    "resend",
+    "vercel"
+  ],
+  "engines": {
+    "node": ">=20.11"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "pnpm": {
+    "overrides": {
+      "resend>svix": "1.92.2",
+      "next>postcss": "8.5.10"
+    }
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "build:vercel": "./scripts/install-op.sh && ./bin/op run --environment \"$OP_ENVIRONMENT_ID\" -- next build",
+    "start": "next start",
+    "lint": "pnpm lint:js && pnpm lint:md",
+    "lint:js": "eslint",
+    "lint:md": "markdownlint-cli2",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@1password/sdk": "0.4.1-beta.1",
+    "botid": "^1.5.11",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.8.0",
+    "next": "16.2.4",
+    "radix-ui": "^1.4.3",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "resend": "^6.12.2",
+    "shadcn": "^4.3.1",
+    "tailwind-merge": "^3.5.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.4",
+    "jsdom": "^29.0.2",
+    "markdownlint-cli2": "^0.22.1",
+    "prettier": "^3.8.3",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vitest": "^4.1.4"
+  }
+}
