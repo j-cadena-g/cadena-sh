@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { Manrope, Space_Grotesk } from "next/font/google";
 import { headers } from "next/headers";
@@ -66,6 +67,7 @@ export default async function RootLayout({
       <body className="min-h-screen">
         {children}
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
