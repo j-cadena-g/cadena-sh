@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { Manrope, Space_Grotesk } from "next/font/google";
 import { headers } from "next/headers";
@@ -62,7 +63,10 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={cn(manrope.variable, spaceGrotesk.variable)}>
-      <body className="min-h-screen">{children}</body>
+      <body className="min-h-screen">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
