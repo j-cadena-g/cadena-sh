@@ -100,6 +100,15 @@ export function PopChip({ className }: { className?: string }) {
 
         const payload = (await response.json()) as PopPayload;
 
+        // Validate payload shape before using it
+        if (
+          payload == null ||
+          typeof payload !== "object" ||
+          typeof payload.region !== "string"
+        ) {
+          throw new Error("Invalid payload shape");
+        }
+
         clearTimeout(timeoutId);
 
         setState({
@@ -162,6 +171,16 @@ export function PopChip({ className }: { className?: string }) {
   }
 
   const { data, latencyMs, protocol } = state;
+
+  // Validate data shape before using it
+  if (
+    data == null ||
+    typeof data !== "object" ||
+    typeof data.region !== "string"
+  ) {
+    throw new Error("Invalid data shape");
+  }
+
   const regionLabel = formatRegion(data.region);
   const protocolLabel = formatProtocol(protocol);
 
