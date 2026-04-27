@@ -112,11 +112,7 @@ export function PopChip({ className }: { className?: string }) {
       .catch((error: Error) => {
         clearTimeout(timeoutId);
 
-        // Don't set error state if the request was aborted
-        if (error.name === "AbortError") {
-          return;
-        }
-
+        // Always transition out of loading state, including for aborted requests
         setState({ status: "error" });
       });
 
