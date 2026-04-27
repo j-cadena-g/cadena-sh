@@ -109,7 +109,7 @@ export function PopChip({ className }: { className?: string }) {
           protocol: readNegotiatedProtocol(),
         });
       })
-      .catch((error: Error) => {
+      .catch(() => {
         clearTimeout(timeoutId);
 
         // Always transition out of loading state, including for aborted requests
@@ -130,7 +130,19 @@ export function PopChip({ className }: { className?: string }) {
   );
 
   if (state.status === "error") {
-    return null;
+    return (
+      <span
+        className={baseClasses}
+        aria-label="Failed to locate edge POP"
+        role="status"
+      >
+        <span
+          className="size-1.5 rounded-full bg-destructive/70"
+          aria-hidden="true"
+        />
+        <span>unavailable</span>
+      </span>
+    );
   }
 
   if (state.status === "loading") {
