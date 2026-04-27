@@ -34,7 +34,6 @@ const productionSecurityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  turbopack: false,
   poweredByHeader: false,
   serverExternalPackages: ["@1password/sdk", "@1password/sdk-core"],
   async redirects() {

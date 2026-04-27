@@ -149,7 +149,7 @@ export function PopChip({ className }: { className?: string }) {
   const tooltipParts = [
     data.city ? `City: ${data.city}` : null,
     data.country ? `Country: ${data.country}` : null,
-    `Edge POP: ${data.region}`,
+    `Edge POP: ${regionLabel || 'Unknown region'}`,
     `Round-trip: ${latencyMs}ms`,
     protocolLabel ? `Protocol: ${protocolLabel}` : null,
   ].filter(Boolean) as string[];
