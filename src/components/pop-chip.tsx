@@ -81,11 +81,15 @@ export function PopChip({ className }: { className?: string }) {
   const [state, setState] = useState<PopState>({ status: "loading" });
 
   useEffect(() => {
-    let cancelled = false;
+    const controller = new AbortController();
     const start =
       typeof performance !== "undefined" ? performance.now() : Date.now();
 
-    fetch(POP_ENDPOINT, { cache: "no-store" })
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, 10000); // 10 second timeout
+
+    fetch(POP_ENDPOINT, { cache: "no-store", signal: controller.signal })
       .then(async (response) => {
         const end =
           typeof performance !== "undefined" ? performance.now() : Date.now();
@@ -96,7 +100,7 @@ export function PopChip({ className }: { className?: string }) {
 
         const payload = (await response.json()) as PopPayload;
 
-        if (cancelled) return;
+        clearTimeout(timeoutId);
 
         setState({
           status: "ready",
@@ -105,13 +109,20 @@ export function PopChip({ className }: { className?: string }) {
           protocol: readNegotiatedProtocol(),
         });
       })
-      .catch(() => {
-        if (cancelled) return;
+      .catch((error: Error) => {
+        clearTimeout(timeoutId);
+
+        // Don't set error state if the request was aborted
+        if (error.name === "AbortError") {
+          return;
+        }
+
         setState({ status: "error" });
       });
 
     return () => {
-      cancelled = true;
+      controller.abort();
+      clearTimeout(timeoutId);
     };
   }, []);
 
