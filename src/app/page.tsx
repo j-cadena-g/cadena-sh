@@ -1,6 +1,7 @@
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 
 import { ContactForm } from "@/components/contact-form";
+import { PopChip } from "@/components/pop-chip";
 import { Button } from "@/components/ui/button";
 import { SectionLabel, SectionRule } from "@/components/ui/section";
 import {
@@ -298,6 +299,7 @@ export default function Home() {
       <footer className="border-t border-border/70">
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-3 px-6 py-8 text-xs text-muted-foreground sm:flex-row sm:items-center sm:px-8 lg:px-12">
           <p>&copy; {new Date().getFullYear()} James Cadena</p>
+          <PopChip />
           <a
             href="https://github.com/j-cadena-g/cadena-sh"
             target="_blank"
