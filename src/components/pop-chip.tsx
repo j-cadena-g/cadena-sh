@@ -151,7 +151,7 @@ export function PopChip({ className }: { className?: string }) {
     data.country ? `Country: ${data.country}` : null,
     `Edge POP: ${data.region}`,
     `Round-trip: ${latencyMs}ms`,
-    protocol ? `Protocol: ${protocol}` : null,
+    protocolLabel ? `Protocol: ${protocolLabel}` : null,
   ].filter(Boolean) as string[];
 
   const ariaLabel = `Served from ${regionLabel}${

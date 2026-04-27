@@ -8,5 +8,5 @@ import { vi } from "vitest";
 // exercise fetch can override this per-suite with vi.stubGlobal("fetch", …).
 vi.stubGlobal(
   "fetch",
-  vi.fn(() => new Promise(() => {})),
+  vi.fn(() => Promise.resolve(new Response(JSON.stringify({}), { status: 200 }))),
 );
