@@ -10,7 +10,12 @@ beforeEach(() => {
   vi.stubGlobal(
     "fetch",
     vi.fn(() =>
-      Promise.resolve(new Response(JSON.stringify({}), { status: 200 })),
+      Promise.resolve(
+        new Response(
+          JSON.stringify({ region: "test-region", city: null, country: null }),
+          { status: 200 },
+        ),
+      ),
     ),
   );
 });
