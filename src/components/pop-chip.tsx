@@ -12,6 +12,20 @@ type PopPayload = {
   country: string | null;
 };
 
+function isPopPayload(value: unknown): value is PopPayload {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const payload = value as Record<string, unknown>;
+
+  return (
+    typeof payload.region === "string" &&
+    (payload.city === null || typeof payload.city === "string") &&
+    (payload.country === null || typeof payload.country === "string")
+  );
+}
+
 type PopState =
   | { status: "loading" }
   | {
@@ -98,15 +112,10 @@ export function PopChip({ className }: { className?: string }) {
           throw new Error(`Unexpected status ${response.status}`);
         }
 
-        const payload = (await response.json()) as PopPayload;
+        const payload: unknown = await response.json();
 
-        // Validate payload shape before using it
-        if (
-          payload == null ||
-          typeof payload !== "object" ||
-          typeof payload.region !== "string"
-        ) {
-          throw new Error("Invalid payload shape");
+        if (!isPopPayload(payload)) {
+          throw new Error("Unexpected /api/pop payload shape");
         }
 
         clearTimeout(timeoutId);
@@ -172,22 +181,13 @@ export function PopChip({ className }: { className?: string }) {
 
   const { data, latencyMs, protocol } = state;
 
-  // Validate data shape before using it
-  if (
-    data == null ||
-    typeof data !== "object" ||
-    typeof data.region !== "string"
-  ) {
-    throw new Error("Invalid data shape");
-  }
-
   const regionLabel = formatRegion(data.region);
   const protocolLabel = formatProtocol(protocol);
 
   const tooltipParts = [
     data.city ? `City: ${data.city}` : null,
     data.country ? `Country: ${data.country}` : null,
-    `Edge POP: ${regionLabel || 'Unknown region'}`,
+    `Edge POP: ${regionLabel || "Unknown region"}`,
     `Round-trip: ${latencyMs}ms`,
     protocolLabel ? `Protocol: ${protocolLabel}` : null,
   ].filter(Boolean) as string[];
