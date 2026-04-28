@@ -30,8 +30,7 @@
   "packageManager": "pnpm@10.33.0",
   "pnpm": {
     "overrides": {
-      "resend>svix": "1.92.2",
-      "next>postcss": "8.5.10"
+      "resend>svix": "1.92.2"
     }
   },
   "scripts": {
