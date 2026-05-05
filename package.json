@@ -61,7 +61,7 @@
     "resend": "^6.12.2",
     "shadcn": "^4.5.0",
     "tailwind-merge": "^3.5.0",
-    "zod": "^4.3.6"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.4",
