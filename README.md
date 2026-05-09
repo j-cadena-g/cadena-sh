@@ -1,6 +1,6 @@
 # cadena.sh
 
-Source for my personal site, built for [james.cadena.sh](https://james.cadena.sh). I'm a network and security engineer, so the infra choices here (1Password-backed secrets, a pinned `op` CLI, Vercel BotID on the contact form, a nonce-based CSP) reflect that background more than the frontend does. It's one page with a contact form.
+Source for my personal site, built for [james.cadena.sh](https://james.cadena.sh). I'm a network and security engineer, so the infra choices here (1Password-backed secrets, a pinned `op` CLI, Vercel BotID on the contact form, a nonce-based CSP, and a tiny edge POP status chip) reflect that background more than the frontend does. It's one page with a contact form.
 
 ![cadena.sh hero](./docs/screenshots/hero-desktop.png)
 
@@ -10,7 +10,9 @@ Source for my personal site, built for [james.cadena.sh](https://james.cadena.sh
 - Tailwind CSS v4, shadcn/ui
 - Resend for the contact form
 - Vercel BotID for abuse protection
+- Vercel Analytics + Speed Insights
 - Nonce-based CSP via a Next.js proxy
+- `/api/pop` footer chip for edge region, latency, and protocol visibility
 - Vitest + Testing Library
 - GitHub Actions CI + Dependabot
 - 1Password Environments for build-time and runtime secrets
