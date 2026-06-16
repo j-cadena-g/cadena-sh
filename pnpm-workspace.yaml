@@ -1,3 +1,10 @@
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+
+overrides:
+  next>postcss: 8.5.12
+  resend>svix: 1.92.2
+  vite: 8.0.16
+  markdown-it: 14.2.0
+  js-yaml: 4.2.0
