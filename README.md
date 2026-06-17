@@ -24,14 +24,13 @@ Source for my personal site, built for [james.cadena.sh](https://james.cadena.sh
 pnpm install
 ```
 
-**With 1Password Environments (recommended).** Resolve the `cadena-sh` Environment ID in 1Password (Developer → Environments), export it, and start the dev server with `op run`:
+**With 1Password Environments (recommended).** The `cadena-sh` Environment UUID is referenced in [`.op/refs.env`](./.op/refs.env). With 1Password unlocked and the desktop `op` CLI available:
 
 ```bash
-export CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID="<your-environment-id>"
 pnpm dev:op
 ```
 
-This injects secrets into the dev process once at launch — no FIFO `.env.local` mount, so Next.js file watchers stay stable. Use the desktop `op` CLI with 1Password unlocked; `OP_ENVIRONMENT_ID` is reserved for Vercel build/deploy.
+This wraps `next dev` with `op run`, injecting secrets once at launch — no FIFO `.env.local` mount, so Next.js file watchers stay stable. Shell exports of `CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID` override the file when set. `OP_ENVIRONMENT_ID` is reserved for Vercel build/deploy.
 
 **Without 1Password.** Copy `.env.example` to `.env.local`, fill in the values, and run:
 
@@ -60,7 +59,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Secrets are managed in **1Password Environments**.
 
-**Local dev.** Prefer `pnpm dev:op`, which wraps `next dev` with `op run --environment "$CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID"`. Export that ID from the `cadena-sh` Environment in 1Password (Developer → Environments → Manage environment). Do not use a FIFO-mounted `.env.local` with Next.js — file watchers can restart in a loop. Forks and CI can fall back to plaintext `.env.local` from `.env.example`.
+**Local dev.** Prefer `pnpm dev:op`, which reads `CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID` from [`.op/refs.env`](./.op/refs.env) and wraps `next dev` with `op run`. Do not use a FIFO-mounted `.env.local` with Next.js — file watchers can restart in a loop. Forks should replace the UUID in `.op/refs.env` or fall back to plaintext `.env.local` from `.env.example`.
 
 **Production (Vercel).** 1Password is the source of truth for contact-form secrets. Vercel stores only:
 
