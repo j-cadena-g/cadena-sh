@@ -4,8 +4,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REFS_FILE="${ROOT_DIR}/.op/refs.env"
-PRIMARY_REF_KEY="CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID"
-FALLBACK_REF_KEY="OP_ENVIRONMENT_ID"
+REF_KEY="CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID"
 
 trim() {
   local input="$1"
@@ -59,25 +58,13 @@ lookup_file_ref() {
 resolve_op_environment_id() {
   local value
 
-  value="$(lookup_shell_ref "${PRIMARY_REF_KEY}")"
+  value="$(lookup_shell_ref "${REF_KEY}")"
   if [ -n "${value}" ]; then
     printf '%s' "${value}"
     return 0
   fi
 
-  value="$(lookup_shell_ref "${FALLBACK_REF_KEY}")"
-  if [ -n "${value}" ]; then
-    printf '%s' "${value}"
-    return 0
-  fi
-
-  value="$(lookup_file_ref "${PRIMARY_REF_KEY}")"
-  if [ -n "${value}" ]; then
-    printf '%s' "${value}"
-    return 0
-  fi
-
-  value="$(lookup_file_ref "${FALLBACK_REF_KEY}")"
+  value="$(lookup_file_ref "${REF_KEY}")"
   if [ -n "${value}" ]; then
     printf '%s' "${value}"
     return 0
