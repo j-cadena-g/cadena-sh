@@ -22,10 +22,24 @@ Source for my personal site, built for [james.cadena.sh](https://james.cadena.sh
 
 ```bash
 pnpm install
+```
+
+**With 1Password Environments (recommended).** Resolve the `cadena-sh` Environment ID in 1Password (Developer → Environments), export it, and start the dev server with `op run`:
+
+```bash
+export CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID="<your-environment-id>"
+pnpm dev:op
+```
+
+This injects secrets into the dev process once at launch — no FIFO `.env.local` mount, so Next.js file watchers stay stable. Use the desktop `op` CLI with 1Password unlocked; `OP_ENVIRONMENT_ID` is reserved for Vercel build/deploy.
+
+**Without 1Password.** Copy `.env.example` to `.env.local`, fill in the values, and run:
+
+```bash
 pnpm dev
 ```
 
-The contact form expects these values, either from a 1Password Environment or from direct local environment variables:
+The contact form expects these values, either from a 1Password Environment (via `dev:op`) or from direct local environment variables:
 
 ```bash
 RESEND_API_KEY       # Resend API key
@@ -46,7 +60,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Secrets are managed in **1Password Environments**.
 
-**Local dev.** `.env.local` can be mounted by 1Password Environments, so Next.js reads the values without plaintext secrets living in the repo. If you are not using 1Password Environments locally, copy `.env.example` to `.env.local` and fill in the direct Resend values.
+**Local dev.** Prefer `pnpm dev:op`, which wraps `next dev` with `op run --environment "$CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID"`. Export that ID from the `cadena-sh` Environment in 1Password (Developer → Environments → Manage environment). Do not use a FIFO-mounted `.env.local` with Next.js — file watchers can restart in a loop. Forks and CI can fall back to plaintext `.env.local` from `.env.example`.
 
 **Production (Vercel).** 1Password is the source of truth for contact-form secrets. Vercel stores only:
 
@@ -65,7 +79,8 @@ The beta CLI is required because `op run --environment` for 1Password Environmen
 ## Scripts
 
 ```bash
-pnpm dev            # dev server
+pnpm dev            # dev server (reads .env.local / process.env)
+pnpm dev:op         # dev server with 1Password Environment injection
 pnpm build          # next build (reads process.env as-is)
 pnpm build:vercel   # installs op, then op run --environment -- next build
 pnpm test           # vitest
