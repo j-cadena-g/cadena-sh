@@ -91,7 +91,7 @@ if [ -z "${OP_ENVIRONMENT_VALUE}" ]; then
   cat >&2 <<'EOF'
 error: missing cadena-sh 1Password Environment reference.
 
-Set CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID in .op/refs.env or export it in your shell.
+Set CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID in .op/refs.env (copy from .op/refs.env.example) or export it in your shell.
 OP_ENVIRONMENT_ID is reserved for Vercel build/deploy.
 EOF
   exit 1

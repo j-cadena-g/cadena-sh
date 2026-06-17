@@ -24,7 +24,7 @@ Source for my personal site, built for [james.cadena.sh](https://james.cadena.sh
 pnpm install
 ```
 
-**With 1Password Environments (recommended).** The `cadena-sh` Environment UUID is referenced in [`.op/refs.env`](./.op/refs.env). With 1Password unlocked and the desktop `op` CLI available:
+**With 1Password Environments (recommended).** Copy [`.op/refs.env.example`](./.op/refs.env.example) to `.op/refs.env` and set the `cadena-sh` Environment UUID from 1Password (Developer → Environments → Manage environment). With 1Password unlocked and the desktop `op` CLI available:
 
 ```bash
 pnpm dev:op
@@ -59,7 +59,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Secrets are managed in **1Password Environments**.
 
-**Local dev.** Prefer `pnpm dev:op`, which reads `CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID` from [`.op/refs.env`](./.op/refs.env) and wraps `next dev` with `op run`. Do not use a FIFO-mounted `.env.local` with Next.js — file watchers can restart in a loop. Forks should replace the UUID in `.op/refs.env` or fall back to plaintext `.env.local` from `.env.example`.
+**Local dev.** Prefer `pnpm dev:op`, which reads `CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID` from gitignored `.op/refs.env` (see [`.op/refs.env.example`](./.op/refs.env.example)) and wraps `next dev` with `op run`. Do not use a FIFO-mounted `.env.local` with Next.js — file watchers can restart in a loop. Forks can fall back to plaintext `.env.local` from `.env.example`.
 
 **Production (Vercel).** 1Password is the source of truth for contact-form secrets. Vercel stores only:
 
