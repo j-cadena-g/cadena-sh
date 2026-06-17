@@ -17,11 +17,26 @@
 /.next/
 /out/
 
+# IDE
+.cursor/
+.vscode/
+
+# AI agents
+.claude/
+.cursor/
+.vercel/
+AGENTS.md
+CLAUDE.md
+
 # production
 /build
 
 # 1Password CLI downloaded by scripts/install-op.sh during build
 /bin
+
+# 1Password Environments
+.op/refs.env
+!.op/refs.env.example
 
 # misc
 .DS_Store
