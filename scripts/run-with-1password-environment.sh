@@ -53,6 +53,8 @@ lookup_file_ref() {
       return 0
     fi
   done < "${REFS_FILE}"
+
+  return 0
 }
 
 resolve_op_environment_id() {
@@ -69,6 +71,8 @@ resolve_op_environment_id() {
     printf '%s' "${value}"
     return 0
   fi
+
+  return 0
 }
 
 if [ "$#" -eq 0 ]; then
