@@ -17,6 +17,17 @@
 /.next/
 /out/
 
+# IDE
+.cursor/
+.vscode/
+
+# AI agents
+.claude/
+.cursor/
+.vercel/
+AGENTS.md
+CLAUDE.md
+
 # production
 /build
 
