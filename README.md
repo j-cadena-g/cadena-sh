@@ -1,7 +1,7 @@
 # cadena.sh
 
 [![CI](https://github.com/j-cadena-g/cadena-sh/actions/workflows/ci.yaml/badge.svg)](https://github.com/j-cadena-g/cadena-sh/actions/workflows/ci.yaml)
-[![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/j-cadena-g/cadena-sh?utm_source=oss&utm_medium=github&utm_campaign=j-cadena-g%2Fcadena-sh&labelColor=171717&color=FF570A&label=CodeRabbit+Reviews)](https://coderabbit.ai)
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/j-cadena-g/cadena-sh?utm_source=oss&utm_medium=github&utm_campaign=j-cadena-g%2Fcadena-sh&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Node.js](https://img.shields.io/badge/node-24.x-green?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js&logoColor=white)](https://nextjs.org/)
