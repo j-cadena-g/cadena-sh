@@ -7,6 +7,10 @@ overrides:
   resend>svix: 1.92.2
   vite: 8.0.16
   markdown-it: 14.2.0
-  js-yaml: 4.2.0
-  hono: 4.12.25
+  js-yaml: 4.3.0
+  hono: 4.12.31
   undici: 7.28.0
+  linkify-it: 5.0.2
+  brace-expansion@1: 1.1.16
+  brace-expansion@5: 5.0.7
+  "@hono/node-server": 2.0.11
