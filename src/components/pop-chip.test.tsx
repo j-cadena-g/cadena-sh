@@ -212,6 +212,39 @@ describe("PopChip", () => {
     expect(screen.queryByText("Ashburn")).not.toBeInTheDocument();
   });
 
+  it("closes the panel when focus moves outside", async () => {
+    stubResourceTiming({
+      name: "http://localhost/api/pop",
+      requestStart: 1,
+      responseEnd: 20,
+      duration: 19,
+      nextHopProtocol: "h2",
+    });
+
+    render(
+      <div>
+        <PopChip />
+        <button type="button">Outside</button>
+      </div>,
+    );
+
+    const trigger = await screen.findByRole("button", {
+      name: /served from iad1/i,
+    });
+
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+
+    const outside = screen.getByRole("button", { name: /outside/i });
+    outside.focus();
+    fireEvent.focusIn(outside);
+
+    await waitFor(() => {
+      expect(trigger).toHaveAttribute("aria-expanded", "false");
+    });
+    expect(screen.queryByText("Ashburn")).not.toBeInTheDocument();
+  });
+
   it("renders unavailable when the lookup fails", async () => {
     fetchMock.mockRejectedValueOnce(new Error("offline"));
 

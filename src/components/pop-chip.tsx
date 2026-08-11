@@ -166,6 +166,7 @@ export function PopChip({ className }: { className?: string }) {
 
   useEffect(() => {
     const controller = new AbortController();
+    let disposed = false;
     const start =
       typeof performance !== "undefined" ? performance.now() : Date.now();
 
@@ -175,20 +176,23 @@ export function PopChip({ className }: { className?: string }) {
 
     fetch(POP_ENDPOINT, { cache: "no-store", signal: controller.signal })
       .then(async (response) => {
-        const end =
-          typeof performance !== "undefined" ? performance.now() : Date.now();
-
         if (!response.ok) {
           throw new Error(`Unexpected status ${response.status}`);
         }
 
         const payload: unknown = await response.json();
+        const end =
+          typeof performance !== "undefined" ? performance.now() : Date.now();
 
         if (!isPopPayload(payload)) {
           throw new Error("Unexpected /api/pop payload shape");
         }
 
         clearTimeout(timeoutId);
+
+        if (disposed) {
+          return;
+        }
 
         const timing = readPopResourceTiming(POP_ENDPOINT);
         const wallClockMs = Math.max(0, Math.round(end - start));
@@ -202,10 +206,16 @@ export function PopChip({ className }: { className?: string }) {
       })
       .catch(() => {
         clearTimeout(timeoutId);
+
+        if (disposed) {
+          return;
+        }
+
         setState({ status: "error" });
       });
 
     return () => {
+      disposed = true;
       controller.abort();
       clearTimeout(timeoutId);
     };
@@ -273,10 +283,10 @@ export function PopChip({ className }: { className?: string }) {
         role="status"
       >
         <span
-          className="size-1.5 animate-pulse rounded-full bg-muted-foreground/40"
+          className="size-1.5 rounded-full bg-muted-foreground/40 motion-safe:animate-pulse"
           aria-hidden="true"
         />
-        <span className="animate-pulse">locating</span>
+        <span className="motion-safe:animate-pulse">locating</span>
       </span>
     );
   }
@@ -305,7 +315,7 @@ export function PopChip({ className }: { className?: string }) {
         type="button"
         className={cn(
           baseClasses,
-          "cursor-pointer transition-[border-color,color,background-color] duration-200 hover:border-foreground/25 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+          "cursor-pointer motion-safe:transition-[border-color,color,background-color] motion-safe:duration-200 hover:border-foreground/25 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
           expanded && "border-foreground/25 text-foreground",
         )}
         aria-expanded={expanded}
@@ -314,10 +324,10 @@ export function PopChip({ className }: { className?: string }) {
         onClick={toggleExpanded}
       >
         <span
-          className="size-1.5 animate-[pop-chip-ready_420ms_ease-out] rounded-full bg-primary/70 shadow-[0_0_6px_var(--brand-shadow)]"
+          className="size-1.5 rounded-full bg-primary/70 shadow-[0_0_6px_var(--brand-shadow)] motion-safe:animate-[pop-chip-ready_420ms_ease-out]"
           aria-hidden="true"
         />
-        <span className="animate-[pop-chip-ready_420ms_ease-out]">
+        <span className="motion-safe:animate-[pop-chip-ready_420ms_ease-out]">
           {regionLabel}
         </span>
         {protocolLabel ? (
@@ -325,7 +335,7 @@ export function PopChip({ className }: { className?: string }) {
             <span aria-hidden="true" className="text-border">
               ·
             </span>
-            <span className="animate-[pop-chip-ready_420ms_ease-out]">
+            <span className="motion-safe:animate-[pop-chip-ready_420ms_ease-out]">
               {protocolLabel}
             </span>
           </>
@@ -333,12 +343,12 @@ export function PopChip({ className }: { className?: string }) {
         <span aria-hidden="true" className="text-border">
           ·
         </span>
-        <span className="animate-[pop-chip-ready_420ms_ease-out] tabular-nums">
+        <span className="tabular-nums motion-safe:animate-[pop-chip-ready_420ms_ease-out]">
           {latencyMs}ms
         </span>
         <ChevronUp
           className={cn(
-            "size-3 text-current transition-transform duration-200",
+            "size-3 text-current motion-safe:transition-transform motion-safe:duration-200",
             expanded ? "rotate-0" : "rotate-180",
           )}
           aria-hidden="true"
@@ -350,7 +360,7 @@ export function PopChip({ className }: { className?: string }) {
           id={panelId}
           role="group"
           aria-label="Edge POP telemetry"
-          className="absolute bottom-[calc(100%+0.5rem)] left-0 z-50 w-max min-w-[12.5rem] origin-bottom animate-[pop-chip-panel_180ms_ease-out] rounded-xl border border-border/70 bg-[#0a0a0a]/95 p-3 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md sm:left-auto sm:right-0"
+          className="absolute bottom-[calc(100%+0.5rem)] left-0 z-50 w-max min-w-[12.5rem] origin-bottom rounded-xl border border-border/70 bg-[#0a0a0a]/95 p-3 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md motion-safe:animate-[pop-chip-panel_180ms_ease-out] sm:left-auto sm:right-0"
         >
           <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 font-mono text-[0.62rem] tracking-[0.14em] uppercase">
             {detailRows.map((row) => (
