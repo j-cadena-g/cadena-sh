@@ -24,8 +24,8 @@ importers:
   .:
     dependencies:
       '@1password/sdk':
-        specifier: 0.4.1-beta.1
-        version: 0.4.1-beta.1
+        specifier: 0.5.0
+        version: 0.5.0
       '@vercel/analytics':
         specifier: ^2.0.1
         version: 2.0.1(next@16.2.12(@babel/core@7.29.7)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)
@@ -117,11 +117,11 @@ importers:
 
 packages:
 
-  '@1password/sdk-core@0.4.1-beta.1':
-    resolution: {integrity: sha512-/otbg1JVhsEn6oUIeReoT9TmFr8J7KBwr9UuRVfJFwwGG3bHPF8ewT+LhRimQeJtypqQ69ZVuOYkxknD4iQHxw==}
+  '@1password/sdk-core@0.5.0':
+    resolution: {integrity: sha512-9g7LWOKRKdePZ85evVgE9xEom3DAg3hRIyQdOwLPvpL/F7KpDXmUHMi72rsqJxKaDbWApXmrYjDExMSPqUg7xw==}
 
-  '@1password/sdk@0.4.1-beta.1':
-    resolution: {integrity: sha512-QWY6eIIEs9at6kAFbgjZ1vVxg7ygp/MwXJ6/BoBdPkqIk8vfulXu4pjDsVQ87HhddJAD5LVGBXSbQIa+svI3bA==}
+  '@1password/sdk@0.5.0':
+    resolution: {integrity: sha512-k6kov3pcA7PRg2tev9CgTfEf/3JSyAp11BPQNCEsqAD32QbqM032OXC1rfjyC8Ba0sfH+NHYZxcifUZToyGyYA==}
 
   '@adobe/css-tools@4.5.0':
     resolution: {integrity: sha512-6OzddxPio9UiWTCemp4N8cYLV2ZN1ncRnV1cVGtve7dhPOtRkleRyx32GQCYSwDYgaHU3USMm84tNsvKzRCa1Q==}
@@ -4778,11 +4778,11 @@ packages:
 
 snapshots:
 
-  '@1password/sdk-core@0.4.1-beta.1': {}
+  '@1password/sdk-core@0.5.0': {}
 
-  '@1password/sdk@0.4.1-beta.1':
+  '@1password/sdk@0.5.0':
     dependencies:
-      '@1password/sdk-core': 0.4.1-beta.1
+      '@1password/sdk-core': 0.5.0
 
   '@adobe/css-tools@4.5.0': {}
 
