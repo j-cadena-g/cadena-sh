@@ -9,7 +9,7 @@ overrides:
   resend>svix: 1.92.2
   vite: 8.0.16
   markdown-it: 14.2.0
-  js-yaml: 4.3.0
+  js-yaml: 4.3.1
   hono: 4.12.34
   undici: 7.29.0
   linkify-it: 5.0.2
