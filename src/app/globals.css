@@ -118,3 +118,25 @@
     color: oklch(0.955 0.004 80);
   }
 }
+
+@keyframes pop-chip-ready {
+  from {
+    opacity: 0.35;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pop-chip-panel {
+  from {
+    opacity: 0;
+    transform: translateY(0.25rem) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
