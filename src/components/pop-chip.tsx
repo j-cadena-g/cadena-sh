@@ -1,15 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { ChevronUp } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
 const POP_ENDPOINT = "/api/pop";
 
+/** Abort the edge POP lookup if it hangs longer than this. */
+const POP_FETCH_TIMEOUT_MS = 10_000;
+
 type PopPayload = {
   region: string;
   city: string | null;
   country: string | null;
+};
+
+export type PopResourceTiming = {
+  latencyMs: number | null;
+  protocol: string | null;
 };
 
 function isPopPayload(value: unknown): value is PopPayload {
@@ -36,14 +45,9 @@ type PopState =
     }
   | { status: "error" };
 
-/**
- * Looks up the PerformanceResourceTiming entry for the most recent
- * `/api/pop` fetch and returns its negotiated protocol (`h2`, `h3`,
- * `http/1.1`). Returns `null` if the entry isn't available — some
- * environments strip `nextHopProtocol` from cross-origin responses,
- * but `/api/pop` is same-origin so it should always be present.
- */
-function readNegotiatedProtocol(): string | null {
+function findLatestPopEntry(
+  endpoint: string,
+): PerformanceResourceTiming | null {
   if (typeof performance === "undefined") {
     return null;
   }
@@ -55,18 +59,46 @@ function readNegotiatedProtocol(): string | null {
 
     for (let i = entries.length - 1; i >= 0; i--) {
       const entry = entries[i];
-      if (entry.name.endsWith(POP_ENDPOINT) && entry.nextHopProtocol) {
-        return entry.nextHopProtocol;
+      if (entry.name.endsWith(endpoint)) {
+        return entry;
       }
     }
   } catch {
-    // PerformanceObserver-style APIs throw on some hardened browsers.
+    // Performance APIs throw on some hardened browsers.
   }
 
   return null;
 }
 
-function formatProtocol(protocol: string | null): string | null {
+/**
+ * Reads transfer timing + negotiated protocol from the most recent
+ * `/api/pop` PerformanceResourceTiming entry.
+ *
+ * Prefers `responseEnd - requestStart` (network RTT-ish) over wall-clock
+ * `performance.now()` spans, which also include JSON parse and React work.
+ */
+export function readPopResourceTiming(endpoint: string): PopResourceTiming {
+  const entry = findLatestPopEntry(endpoint);
+
+  if (!entry) {
+    return { latencyMs: null, protocol: null };
+  }
+
+  let latencyMs: number | null = null;
+
+  if (entry.requestStart > 0 && entry.responseEnd >= entry.requestStart) {
+    latencyMs = Math.max(0, Math.round(entry.responseEnd - entry.requestStart));
+  } else if (entry.duration > 0) {
+    latencyMs = Math.max(0, Math.round(entry.duration));
+  }
+
+  return {
+    latencyMs,
+    protocol: entry.nextHopProtocol || null,
+  };
+}
+
+export function formatProtocol(protocol: string | null): string | null {
   if (!protocol) {
     return null;
   }
@@ -91,8 +123,46 @@ function formatRegion(region: string): string {
   return region;
 }
 
+type DetailRow = {
+  label: string;
+  value: string;
+};
+
+function buildDetailRows({
+  data,
+  latencyMs,
+  protocolLabel,
+  regionLabel,
+}: {
+  data: PopPayload;
+  latencyMs: number;
+  protocolLabel: string | null;
+  regionLabel: string;
+}): DetailRow[] {
+  const rows: DetailRow[] = [{ label: "POP", value: regionLabel }];
+
+  if (data.city) {
+    rows.push({ label: "City", value: data.city });
+  }
+
+  if (data.country) {
+    rows.push({ label: "Country", value: data.country });
+  }
+
+  if (protocolLabel) {
+    rows.push({ label: "Proto", value: protocolLabel });
+  }
+
+  rows.push({ label: "RTT", value: `${latencyMs}ms` });
+
+  return rows;
+}
+
 export function PopChip({ className }: { className?: string }) {
   const [state, setState] = useState<PopState>({ status: "loading" });
+  const [expanded, setExpanded] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const panelId = useId();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -101,7 +171,7 @@ export function PopChip({ className }: { className?: string }) {
 
     const timeoutId = setTimeout(() => {
       controller.abort();
-    }, 10000); // 10 second timeout
+    }, POP_FETCH_TIMEOUT_MS);
 
     fetch(POP_ENDPOINT, { cache: "no-store", signal: controller.signal })
       .then(async (response) => {
@@ -120,17 +190,18 @@ export function PopChip({ className }: { className?: string }) {
 
         clearTimeout(timeoutId);
 
+        const timing = readPopResourceTiming(POP_ENDPOINT);
+        const wallClockMs = Math.max(0, Math.round(end - start));
+
         setState({
           status: "ready",
           data: payload,
-          latencyMs: Math.max(0, Math.round(end - start)),
-          protocol: readNegotiatedProtocol(),
+          latencyMs: timing.latencyMs ?? wallClockMs,
+          protocol: timing.protocol,
         });
       })
       .catch(() => {
         clearTimeout(timeoutId);
-
-        // Always transition out of loading state, including for aborted requests
         setState({ status: "error" });
       });
 
@@ -140,8 +211,39 @@ export function PopChip({ className }: { className?: string }) {
     };
   }, []);
 
-  // Reserve roughly the same horizontal footprint across states so the
-  // footer doesn't reflow once the lookup resolves.
+  useEffect(() => {
+    if (!expanded) {
+      return;
+    }
+
+    function closeIfOutside(event: Event) {
+      const root = rootRef.current;
+      if (!root || !(event.target instanceof Node)) {
+        return;
+      }
+
+      if (!root.contains(event.target)) {
+        setExpanded(false);
+      }
+    }
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setExpanded(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", closeIfOutside);
+    document.addEventListener("focusin", closeIfOutside);
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", closeIfOutside);
+      document.removeEventListener("focusin", closeIfOutside);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [expanded]);
+
   const baseClasses = cn(
     "inline-flex items-center gap-2 rounded-full border border-border/70 bg-white/[0.02] px-2.5 py-1 font-mono text-[0.62rem] tracking-[0.18em] uppercase text-muted-foreground",
     className,
@@ -171,54 +273,97 @@ export function PopChip({ className }: { className?: string }) {
         role="status"
       >
         <span
-          className="size-1.5 rounded-full bg-muted-foreground/40"
+          className="size-1.5 animate-pulse rounded-full bg-muted-foreground/40"
           aria-hidden="true"
         />
-        <span>locating</span>
+        <span className="animate-pulse">locating</span>
       </span>
     );
   }
 
   const { data, latencyMs, protocol } = state;
-
   const regionLabel = formatRegion(data.region);
   const protocolLabel = formatProtocol(protocol);
-
-  const tooltipParts = [
-    data.city ? `City: ${data.city}` : null,
-    data.country ? `Country: ${data.country}` : null,
-    `Edge POP: ${regionLabel || "Unknown region"}`,
-    `Round-trip: ${latencyMs}ms`,
-    protocolLabel ? `Protocol: ${protocolLabel}` : null,
-  ].filter(Boolean) as string[];
+  const detailRows = buildDetailRows({
+    data,
+    latencyMs,
+    protocolLabel,
+    regionLabel,
+  });
 
   const ariaLabel = `Served from ${regionLabel}${
     protocolLabel ? ` over ${protocolLabel}` : ""
   } in ${latencyMs} milliseconds`;
 
+  function toggleExpanded() {
+    setExpanded((current) => !current);
+  }
+
   return (
-    <span
-      className={baseClasses}
-      title={tooltipParts.join("\n")}
-      aria-label={ariaLabel}
-    >
-      <span
-        className="size-1.5 rounded-full bg-primary/70 shadow-[0_0_6px_var(--brand-shadow)]"
-        aria-hidden="true"
-      />
-      <span>{regionLabel}</span>
-      {protocolLabel ? (
-        <>
-          <span aria-hidden="true" className="text-border">
-            ·
-          </span>
-          <span>{protocolLabel}</span>
-        </>
+    <div ref={rootRef} className="relative inline-flex">
+      <button
+        type="button"
+        className={cn(
+          baseClasses,
+          "cursor-pointer transition-[border-color,color,background-color] duration-200 hover:border-foreground/25 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+          expanded && "border-foreground/25 text-foreground",
+        )}
+        aria-expanded={expanded}
+        aria-controls={expanded ? panelId : undefined}
+        aria-label={ariaLabel}
+        onClick={toggleExpanded}
+      >
+        <span
+          className="size-1.5 animate-[pop-chip-ready_420ms_ease-out] rounded-full bg-primary/70 shadow-[0_0_6px_var(--brand-shadow)]"
+          aria-hidden="true"
+        />
+        <span className="animate-[pop-chip-ready_420ms_ease-out]">
+          {regionLabel}
+        </span>
+        {protocolLabel ? (
+          <>
+            <span aria-hidden="true" className="text-border">
+              ·
+            </span>
+            <span className="animate-[pop-chip-ready_420ms_ease-out]">
+              {protocolLabel}
+            </span>
+          </>
+        ) : null}
+        <span aria-hidden="true" className="text-border">
+          ·
+        </span>
+        <span className="animate-[pop-chip-ready_420ms_ease-out] tabular-nums">
+          {latencyMs}ms
+        </span>
+        <ChevronUp
+          className={cn(
+            "size-3 text-current transition-transform duration-200",
+            expanded ? "rotate-0" : "rotate-180",
+          )}
+          aria-hidden="true"
+        />
+      </button>
+
+      {expanded ? (
+        <div
+          id={panelId}
+          role="group"
+          aria-label="Edge POP telemetry"
+          className="absolute bottom-[calc(100%+0.5rem)] left-0 z-50 w-max min-w-[12.5rem] origin-bottom animate-[pop-chip-panel_180ms_ease-out] rounded-xl border border-border/70 bg-[#0a0a0a]/95 p-3 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md sm:left-auto sm:right-0"
+        >
+          <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 font-mono text-[0.62rem] tracking-[0.14em] uppercase">
+            {detailRows.map((row) => (
+              <div key={row.label} className="contents">
+                <dt className="text-muted-foreground/80">{row.label}</dt>
+                <dd className="text-right text-foreground/90 tabular-nums normal-case tracking-normal">
+                  {row.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
       ) : null}
-      <span aria-hidden="true" className="text-border">
-        ·
-      </span>
-      <span className="tabular-nums">{latencyMs}ms</span>
-    </span>
+    </div>
   );
 }
