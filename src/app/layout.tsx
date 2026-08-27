@@ -4,6 +4,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { Manrope, Space_Grotesk } from "next/font/google";
 import { headers } from "next/headers";
+import { ThemeProvider } from "@/components/theme-provider";
 import { CANONICAL_ORIGIN } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -20,8 +21,11 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const viewport: Viewport = {
-  colorScheme: "dark",
-  themeColor: "#050505",
+  colorScheme: "dark light",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f6f5f2" },
+    { media: "(prefers-color-scheme: dark)", color: "#050505" },
+  ],
 };
 
 export const metadata: Metadata = {
@@ -59,15 +63,29 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   // Reading request headers opts this layout into dynamic rendering so Next.js
-  // attaches CSP nonces to its framework scripts.
-  await headers();
+  // attaches CSP nonces to its framework scripts. The same nonce is passed to
+  // next-themes so its blocking inline script survives the CSP.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   return (
-    <html lang="en" className={cn(manrope.variable, spaceGrotesk.variable)}>
+    <html
+      lang="en"
+      className={cn(manrope.variable, spaceGrotesk.variable)}
+      suppressHydrationWarning
+    >
       <body className="min-h-screen">
-        {children}
-        <Analytics />
-        <SpeedInsights />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+          storageKey="cadena-theme"
+          nonce={nonce}
+        >
+          {children}
+          <Analytics />
+          <SpeedInsights />
+        </ThemeProvider>
       </body>
     </html>
   );

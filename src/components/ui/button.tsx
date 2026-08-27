@@ -13,7 +13,7 @@ const buttonVariants = cva(
         brand:
           "border-transparent bg-[linear-gradient(135deg,var(--brand-start),var(--brand-end))] text-black shadow-[0_8px_24px_var(--brand-shadow)] hover:brightness-105",
         subtle:
-          "border-white/12 bg-white/[0.02] text-zinc-100 hover:bg-white/[0.05] focus-visible:border-ring",
+          "border-border bg-muted/40 text-foreground hover:bg-muted hover:text-foreground focus-visible:border-ring",
         outline:
           "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
         secondary:
