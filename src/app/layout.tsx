@@ -6,6 +6,7 @@ import { Manrope, Space_Grotesk } from "next/font/google";
 import { headers } from "next/headers";
 import { ThemeProvider } from "@/components/theme-provider";
 import { CANONICAL_ORIGIN } from "@/lib/site";
+import { THEME_STORAGE_KEY } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
 const socialImage = `${CANONICAL_ORIGIN}/opengraph-image`;
@@ -79,7 +80,7 @@ export default async function RootLayout({
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
-          storageKey="cadena-theme"
+          storageKey={THEME_STORAGE_KEY}
           nonce={nonce}
         >
           {children}
