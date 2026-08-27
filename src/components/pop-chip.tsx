@@ -255,7 +255,7 @@ export function PopChip({ className }: { className?: string }) {
   }, [expanded]);
 
   const baseClasses = cn(
-    "inline-flex items-center gap-2 rounded-full border border-border/70 bg-white/[0.02] px-2.5 py-1 font-mono text-[0.62rem] tracking-[0.18em] uppercase text-muted-foreground",
+    "inline-flex items-center gap-2 rounded-full border border-border/70 bg-muted/40 px-2.5 py-1 font-mono text-[0.62rem] tracking-[0.18em] uppercase text-muted-foreground",
     className,
   );
 
@@ -360,7 +360,7 @@ export function PopChip({ className }: { className?: string }) {
           id={panelId}
           role="group"
           aria-label="Edge POP telemetry"
-          className="absolute bottom-[calc(100%+0.5rem)] left-0 z-50 w-max min-w-[12.5rem] origin-bottom rounded-xl border border-border/70 bg-[#0a0a0a]/95 p-3 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md motion-safe:animate-[pop-chip-panel_180ms_ease-out] sm:left-auto sm:right-0"
+          className="absolute bottom-[calc(100%+0.5rem)] left-0 z-50 w-max min-w-[12.5rem] origin-bottom rounded-xl border border-border/70 bg-popover/95 p-3 shadow-lg backdrop-blur-md motion-safe:animate-[pop-chip-panel_180ms_ease-out] sm:left-auto sm:right-0"
         >
           <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 font-mono text-[0.62rem] tracking-[0.14em] uppercase">
             {detailRows.map((row) => (

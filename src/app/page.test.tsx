@@ -47,5 +47,9 @@ describe("Home", () => {
         name: /^x$/i,
       }),
     ).toHaveAttribute("href", "https://x.com/j_cadena_g");
+
+    expect(
+      screen.getByRole("radiogroup", { name: "Theme" }),
+    ).toBeInTheDocument();
   });
 });

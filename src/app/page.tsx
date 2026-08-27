@@ -2,6 +2,7 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 
 import { ContactForm } from "@/components/contact-form";
 import { PopChip } from "@/components/pop-chip";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Button } from "@/components/ui/button";
 import { SectionLabel, SectionRule } from "@/components/ui/section";
 import {
@@ -42,20 +43,23 @@ export default function Home() {
           >
             cadena.sh
           </a>
-          <nav
-            aria-label="Primary"
-            className="flex items-center gap-x-4 text-xs text-muted-foreground sm:gap-x-5 sm:text-sm"
-          >
-            {navItems.map((item) => (
-              <a
-                key={item.id}
-                href={`#${item.id}`}
-                className={`rounded-sm transition-colors hover:text-foreground ${focusRing}`}
-              >
-                {item.label}
-              </a>
-            ))}
-          </nav>
+          <div className="flex items-center gap-x-3 sm:gap-x-5">
+            <nav
+              aria-label="Primary"
+              className="flex items-center gap-x-4 text-xs text-muted-foreground sm:gap-x-5 sm:text-sm"
+            >
+              {navItems.map((item) => (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  className={`rounded-sm transition-colors hover:text-foreground ${focusRing}`}
+                >
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+            <ThemeSwitcher />
+          </div>
         </div>
       </header>
 
@@ -71,7 +75,7 @@ export default function Home() {
                 <h1 className="font-heading text-5xl leading-none tracking-[-0.08em] text-balance text-foreground sm:text-6xl lg:text-8xl">
                   James Cadena
                 </h1>
-                <p className="max-w-2xl text-xl leading-8 tracking-[-0.03em] text-zinc-200 sm:text-2xl">
+                <p className="max-w-2xl text-xl leading-8 tracking-[-0.03em] text-foreground/90 sm:text-2xl">
                   Infrastructure across networks, systems, and security.
                 </p>
               </div>
@@ -161,7 +165,7 @@ export default function Home() {
                   <p className="font-heading text-2xl tracking-[-0.06em] text-foreground">
                     {point.value}
                   </p>
-                  <p className="text-sm font-medium text-zinc-200">
+                  <p className="text-sm font-medium text-foreground/90">
                     {point.label}
                   </p>
                   <p className="text-sm leading-6 text-muted-foreground">
@@ -289,7 +293,7 @@ export default function Home() {
                 talk tech and AI.
               </p>
             </div>
-            <div className="rounded-[1.75rem] border border-border/70 bg-white/[0.015] p-5 sm:p-7">
+            <div className="rounded-[1.75rem] border border-border/70 bg-card/70 p-5 sm:p-7">
               <ContactForm />
             </div>
           </section>
