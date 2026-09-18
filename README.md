@@ -32,13 +32,13 @@ Source for my personal site, built for [james.cadena.sh](https://james.cadena.sh
 pnpm install
 ```
 
-**With 1Password Environments (recommended).** Copy [`.op/refs.env.example`](./.op/refs.env.example) to `.op/refs.env` and set the `cadena-sh` Environment UUID from 1Password (Developer → Environments → Manage environment). With 1Password unlocked and the desktop `op` CLI available:
+**With 1Password Environments (optional).** Create a 1Password Environment in your own account that holds the contact-form variables below. Copy [`.op/refs.env.example`](./.op/refs.env.example) to `.op/refs.env` and paste that Environment's UUID into `CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID`. Find the UUID in 1Password under Developer → Environments → Manage environment. With 1Password unlocked and the desktop `op` CLI available:
 
 ```bash
 pnpm dev:op
 ```
 
-This wraps `next dev` with `op run`, injecting secrets once at launch — no FIFO `.env.local` mount, so Next.js file watchers stay stable. Shell exports of `CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID` override the file when set. `OP_ENVIRONMENT_ID` is reserved for Vercel build/deploy.
+This wraps `next dev` with `op run`, injecting secrets once at launch. There is no FIFO `.env.local` mount, so Next.js file watchers stay stable. Shell exports of `CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID` override the file when set. `OP_ENVIRONMENT_ID` is reserved for Vercel build/deploy.
 
 **Without 1Password.** Copy `.env.example` to `.env.local`, fill in the values, and run:
 
@@ -55,7 +55,7 @@ RESEND_FROM_NAME     # display name for the From header
 CONTACT_EMAIL_TO     # inbox that receives contact submissions
 ```
 
-`RESEND_FROM_EMAIL` has to be on a domain you have verified in the Resend dashboard — otherwise Resend rejects the send at runtime and the contact form will surface a 500.
+`RESEND_FROM_EMAIL` has to be on a domain you have verified in the Resend dashboard. Otherwise Resend rejects the send at runtime and the contact form will surface a 500.
 
 See [Secrets](#secrets) for the production source-of-truth model.
 
@@ -65,14 +65,14 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Secrets
 
-Secrets are managed in **1Password Environments**.
+Secrets can be managed in **1Password Environments** you create in your own account.
 
-**Local dev.** Prefer `pnpm dev:op`, which reads `CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID` from gitignored `.op/refs.env` (see [`.op/refs.env.example`](./.op/refs.env.example)) and wraps `next dev` with `op run`. Do not use a FIFO-mounted `.env.local` with Next.js — file watchers can restart in a loop. Forks can fall back to plaintext `.env.local` from `.env.example`.
+**Local dev.** If you use 1Password, `pnpm dev:op` reads `CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID` from gitignored `.op/refs.env` (see [`.op/refs.env.example`](./.op/refs.env.example)) and wraps `next dev` with `op run`. Point that variable at an Environment in your account that contains the contact-form variables. Do not use a FIFO-mounted `.env.local` with Next.js. File watchers can restart in a loop. Otherwise copy `.env.example` to `.env.local`.
 
-**Production (Vercel).** 1Password is the source of truth for contact-form secrets. Vercel stores only:
+**Production (Vercel).** When 1Password is the source of truth for contact-form secrets, Vercel stores only:
 
-- `OP_SERVICE_ACCOUNT_TOKEN` — a scoped service account token with read-only access to this Environment
-- `OP_ENVIRONMENT_ID` — the ID of the 1Password Environment to load
+- `OP_SERVICE_ACCOUNT_TOKEN`: a scoped service account token with read-only access to the Environment you configure
+- `OP_ENVIRONMENT_ID`: the ID of that 1Password Environment
 
 Build-time and runtime use different 1Password integrations:
 
