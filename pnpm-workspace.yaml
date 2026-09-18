@@ -5,13 +5,14 @@ ignoredBuiltDependencies:
 overrides:
   next>postcss: 8.5.25
   "@tailwindcss/postcss>postcss": 8.5.25
-  next>sharp: 0.35.0
+  next>sharp: 0.35.4
   resend>svix: 1.92.2
   vite: 8.0.16
   markdown-it: 14.2.0
-  js-yaml: 4.3.1
+  js-yaml: 4.3.2
   nanoid: 3.3.18
-  hono: 4.12.34
+  hono: 4.13.5
+  smol-toml: 1.7.1
   undici: 7.29.0
   linkify-it: 5.0.2
   brace-expansion@1: 1.1.18
