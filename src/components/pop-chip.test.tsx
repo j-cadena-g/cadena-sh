@@ -1,11 +1,8 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import {
-  formatProtocol,
-  PopChip,
-  readPopResourceTiming,
-} from "./pop-chip";
+import { PopChip } from "./pop-chip";
+import { formatProtocol, readPopResourceTiming } from "./pop-telemetry";
 
 const fetchMock = vi.fn<typeof fetch>();
 

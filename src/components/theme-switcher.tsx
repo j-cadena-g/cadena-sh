@@ -5,6 +5,15 @@ import { useTheme } from "next-themes";
 import { useId, useSyncExternalStore } from "react";
 
 import { THEME_STORAGE_KEY } from "@/lib/theme";
+import { cn } from "@/lib/utils";
+
+// Thumb offsets as classes rather than an inline style: the nonce-based CSP
+// blocks server-rendered style attributes.
+const THUMB_OFFSETS = [
+  "translate-x-0",
+  "translate-x-full",
+  "translate-x-[200%]",
+];
 
 const THEME_OPTIONS = [
   { value: "dark", label: "Dark", Icon: Moon },
@@ -64,11 +73,11 @@ function ThemeSwitcher({ className }: { className?: string }) {
         <div className="relative grid grid-cols-3">
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 left-0 w-1/3 rounded-full bg-background shadow-[0_1px_2px_oklch(0.2_0.02_40/0.12)] motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out"
-            style={{
-              transform: `translateX(${Math.max(selectedIndex, 0) * 100}%)`,
-              opacity: selectedIndex >= 0 ? 1 : 0,
-            }}
+            className={cn(
+              "pointer-events-none absolute inset-y-0 left-0 w-1/3 rounded-full bg-background shadow-[0_1px_2px_oklch(0.2_0.02_40/0.12)] motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out",
+              THUMB_OFFSETS[Math.max(selectedIndex, 0)],
+              selectedIndex >= 0 ? "opacity-100" : "opacity-0",
+            )}
           />
           {THEME_OPTIONS.map(({ value, label, Icon }) => {
             const optionId = `${groupId}-${value}`;

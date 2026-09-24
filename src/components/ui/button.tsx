@@ -11,7 +11,7 @@ const buttonVariants = cva(
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/80",
         brand:
-          "border-transparent bg-[linear-gradient(135deg,var(--brand-start),var(--brand-end))] text-black shadow-[0_8px_24px_var(--brand-shadow)] hover:brightness-105",
+          "border-transparent bg-[linear-gradient(135deg,var(--brand-start),var(--brand-end))] text-black shadow-[inset_0_1px_0_oklch(1_0_0/0.35),0_8px_24px_var(--brand-shadow)] hover:shadow-[inset_0_1px_0_oklch(1_0_0/0.4),0_10px_32px_var(--brand-shadow)] hover:brightness-105",
         subtle:
           "border-border bg-muted/40 text-foreground hover:bg-muted hover:text-foreground focus-visible:border-ring",
         outline:

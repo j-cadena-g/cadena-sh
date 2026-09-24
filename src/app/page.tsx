@@ -1,16 +1,19 @@
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 
+import { ChainMark } from "@/components/chain-mark";
 import { ContactForm } from "@/components/contact-form";
 import { PopChip } from "@/components/pop-chip";
+import { RouteTrace } from "@/components/route-trace";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Button } from "@/components/ui/button";
-import { SectionLabel, SectionRule } from "@/components/ui/section";
+import { SectionLabel, SectionMarker } from "@/components/ui/section";
 import {
   capabilityGroups,
   impactItems,
   profileLinks,
   proofPoints,
 } from "@/content/home";
+import { cn } from "@/lib/utils";
 
 const navItems = [
   { id: "impact", label: "Work" },
@@ -19,6 +22,8 @@ const navItems = [
   { id: "contact", label: "Contact" },
 ];
 
+const SOURCE_URL = "https://github.com/j-cadena-g/cadena-sh";
+
 // A single shared focus-ring treatment for plain anchor links so keyboard
 // users get the same visual affordance the form controls already have.
 const focusRing =
@@ -26,34 +31,74 @@ const focusRing =
 
 const sectionScrollOffset = "scroll-mt-24";
 
+// Gutter and max width shared by every band, so sections can run full-bleed
+// backgrounds while their content stays on the same grid.
+const shell = "mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12";
+
+const sectionHeading =
+  "font-heading text-4xl font-medium tracking-[-0.045em] text-balance text-foreground sm:text-5xl";
+
+function pad(value: number) {
+  return String(value).padStart(2, "0");
+}
+
+// Section numbers follow the nav order, so the two can never drift apart.
+function sectionIndex(id: string) {
+  return pad(navItems.findIndex((item) => item.id === id) + 1);
+}
+
 export default function Home() {
   return (
-    <div className="relative flex min-h-screen flex-col overflow-x-hidden">
+    <div className="relative isolate flex min-h-screen flex-col overflow-x-hidden">
       <a
         href="#main"
         className="sr-only z-50 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground focus:not-sr-only focus:fixed focus:top-4 focus:left-4"
       >
         Skip to content
       </a>
-      <header className="sticky top-0 z-40 border-b border-border/70 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-3 sm:px-8 sm:py-4 lg:px-12">
+
+      {/* Blueprint backdrop: a fading grid and an amber glow behind the hero. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[62rem] overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-grid [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black_35%,transparent_100%)]" />
+        <div className="absolute -top-80 left-1/2 h-[48rem] w-[min(84rem,150vw)] -translate-x-1/2 bg-[radial-gradient(closest-side,var(--glow),transparent)]" />
+      </div>
+
+      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur-md supports-[backdrop-filter]:bg-background/55">
+        <div
+          className={cn(
+            shell,
+            "flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-3",
+          )}
+        >
           <a
             href="#top"
-            className={`rounded-sm font-heading text-[0.72rem] tracking-[0.32em] uppercase text-foreground transition-colors hover:text-primary sm:text-[0.74rem] sm:tracking-[0.34em] ${focusRing}`}
+            className={`group inline-flex items-center gap-2 rounded-sm font-mono text-[0.82rem] font-medium tracking-tight text-foreground ${focusRing}`}
           >
-            cadena.sh
+            <ChainMark className="size-5 motion-safe:transition-transform motion-safe:duration-300 group-hover:-rotate-12" />
+            <span>
+              cadena<span className="text-primary">.sh</span>
+            </span>
           </a>
-          <div className="flex items-center gap-x-3 sm:gap-x-5">
+          <div className="flex items-center gap-x-3 sm:gap-x-6">
             <nav
               aria-label="Primary"
-              className="flex items-center gap-x-4 text-xs text-muted-foreground sm:gap-x-5 sm:text-sm"
+              className="flex items-center gap-x-4 text-xs text-muted-foreground sm:gap-x-6 sm:text-sm"
             >
-              {navItems.map((item) => (
+              {navItems.map((item, index) => (
                 <a
                   key={item.id}
                   href={`#${item.id}`}
-                  className={`rounded-sm transition-colors hover:text-foreground ${focusRing}`}
+                  className={`group inline-flex items-baseline gap-1.5 rounded-sm transition-colors hover:text-foreground ${focusRing}`}
                 >
+                  <span
+                    aria-hidden="true"
+                    className="hidden font-mono text-[0.62rem] text-primary/70 transition-colors group-hover:text-primary md:inline"
+                  >
+                    {pad(index + 1)}
+                  </span>
                   {item.label}
                 </a>
               ))}
@@ -64,255 +109,342 @@ export default function Home() {
       </header>
 
       <main id="main" className="flex-1">
-        <div className="mx-auto flex max-w-7xl flex-col gap-12 px-5 py-10 sm:gap-14 sm:px-8 sm:py-14 lg:px-12">
-          <section
-            id="top"
-            className={`grid gap-12 md:grid-cols-[minmax(0,1.3fr)_minmax(18rem,0.7fr)] md:items-end ${sectionScrollOffset}`}
-          >
-            <div className="flex flex-col gap-8">
-              <SectionLabel>Network &amp; Security Engineer</SectionLabel>
-              <div className="flex max-w-4xl flex-col gap-5">
-                <h1 className="font-heading text-5xl leading-none tracking-[-0.08em] text-balance text-foreground sm:text-6xl lg:text-8xl">
-                  James Cadena
-                </h1>
-                <p className="max-w-2xl text-xl leading-8 tracking-[-0.03em] text-foreground/90 sm:text-2xl">
+        <section id="top" className={sectionScrollOffset}>
+          <div className={cn(shell, "pt-14 pb-16 sm:pt-20 sm:pb-20 lg:pt-24")}>
+            <p className="flex items-center gap-3 font-mono text-[0.72rem] tracking-[0.16em] uppercase text-muted-foreground motion-safe:animate-rise">
+              <span aria-hidden="true" className="h-px w-8 bg-primary" />
+              Network &amp; Security Engineer
+            </p>
+            {/* Phones get the name on two larger lines; from sm up it fits on one. */}
+            <h1 className="mt-6 font-heading text-[17vw] leading-[0.85] font-medium tracking-[-0.055em] text-foreground sm:text-[clamp(3.4rem,11.2vw,10.5rem)] motion-safe:animate-rise motion-safe:[animation-delay:80ms]">
+              James{" "}
+              <span className="whitespace-nowrap">
+                Cadena
+                {/* An underscore cursor, so it can't be misread as a letter,
+                    and bound to the last word so it never wraps on its own. */}
+                <span
+                  aria-hidden="true"
+                  className="ml-[0.08em] inline-block h-[0.065em] w-[0.42em] bg-primary align-baseline motion-safe:animate-caret"
+                />
+              </span>
+            </h1>
+
+            <div className="mt-12 grid gap-12 lg:mt-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,27rem)] lg:items-end lg:gap-16">
+              <div className="flex flex-col gap-7 motion-safe:animate-rise motion-safe:[animation-delay:160ms]">
+                <p className="max-w-2xl font-heading text-2xl leading-[1.2] tracking-[-0.03em] text-foreground sm:text-[2rem]">
                   Infrastructure across networks, systems, and security.
                 </p>
-              </div>
-              <p className="max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
-                I build and run infrastructure that has to stay secure,
-                reliable, and usable in production. I keep the stack current
-                without adding avoidable failure modes.
-              </p>
-              <ul
-                aria-label="Profiles"
-                className="flex flex-wrap items-center gap-2"
-              >
-                {profileLinks.map(({ id, label, href, Icon }) => (
-                  <li key={id}>
-                    <a
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={label}
-                      title={label}
-                      className={`inline-flex items-center justify-center rounded-full border border-border/80 p-2 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/20 hover:text-foreground ${focusRing}`}
-                    >
-                      <Icon className="size-4 text-current" />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
-                <Button
-                  asChild
-                  variant="brand"
-                  size="lg"
-                  className="rounded-full px-5"
-                >
-                  <a href="#impact">
-                    View work
-                    <ArrowRight data-icon="inline-end" aria-hidden="true" />
-                  </a>
-                </Button>
-                <Button
-                  asChild
-                  variant="subtle"
-                  size="lg"
-                  className="rounded-full px-5"
-                >
-                  <a href="#contact">Get in touch</a>
-                </Button>
-              </div>
-            </div>
-
-            <aside className="flex flex-col gap-6">
-              <div className="flex flex-col gap-3 border-t border-border/70 pt-5">
-                <SectionLabel>Path</SectionLabel>
-                <p className="text-sm leading-7 text-muted-foreground">
-                  I started on the service desk and moved into infrastructure,
-                  security, and systems work. Same thread throughout: better
-                  access, tighter controls, systems that stay out of the way.
+                <p className="max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
+                  I build and run infrastructure that has to stay secure,
+                  reliable, and usable in production. I keep the stack current
+                  without adding avoidable failure modes.
                 </p>
-              </div>
-              <div className="flex flex-col gap-3 border-t border-border/70 pt-5">
-                <SectionLabel>Source</SectionLabel>
-                <div className="flex items-center justify-between gap-4">
-                  <p className="max-w-[14rem] text-sm leading-6 text-muted-foreground">
-                    How this site is built.
-                  </p>
-                  <a
-                    href="https://github.com/j-cadena-g/cadena-sh"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`inline-flex items-center gap-2 rounded-sm text-sm text-foreground transition-colors hover:text-primary ${focusRing}`}
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-5 pt-1">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Button
+                      asChild
+                      variant="brand"
+                      size="lg"
+                      className="h-11 rounded-full px-6 text-[0.95rem]"
+                    >
+                      <a href="#impact">
+                        View work
+                        <ArrowRight
+                          data-icon="inline-end"
+                          aria-hidden="true"
+                          className="motion-safe:transition-transform group-hover/button:translate-x-0.5"
+                        />
+                      </a>
+                    </Button>
+                    <Button
+                      asChild
+                      variant="subtle"
+                      size="lg"
+                      className="h-11 rounded-full px-6 text-[0.95rem]"
+                    >
+                      <a href="#contact">Get in touch</a>
+                    </Button>
+                  </div>
+                  <span
+                    aria-hidden="true"
+                    className="hidden h-6 w-px bg-border sm:block"
+                  />
+                  <ul
+                    aria-label="Profiles"
+                    className="flex items-center gap-1.5"
                   >
-                    <span>Source</span>
-                    <ArrowUpRight className="size-4" aria-hidden="true" />
-                  </a>
+                    {profileLinks.map(({ id, label, href, Icon }) => (
+                      <li key={id}>
+                        <a
+                          href={href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={label}
+                          title={label}
+                          className={`inline-flex size-10 items-center justify-center rounded-full border border-transparent text-muted-foreground transition-colors hover:border-border hover:bg-muted/60 hover:text-foreground ${focusRing}`}
+                        >
+                          <Icon className="size-4 text-current" />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
-            </aside>
-          </section>
 
-          <section aria-label="Focus areas">
-            <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              {proofPoints.map((point) => (
-                <li
-                  key={point.id}
-                  className="flex flex-col gap-3 border-t border-border/70 pt-5"
-                >
-                  <p className="font-heading text-2xl tracking-[-0.06em] text-foreground">
-                    {point.value}
-                  </p>
-                  <p className="text-sm font-medium text-foreground/90">
-                    {point.label}
-                  </p>
-                  <p className="text-sm leading-6 text-muted-foreground">
-                    {point.description}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <SectionRule />
-
-          <section
-            id="impact"
-            className={`grid gap-x-10 gap-y-8 lg:grid-cols-[14rem_minmax(0,1fr)] ${sectionScrollOffset}`}
-          >
-            <div className="flex flex-col gap-4">
-              <SectionLabel>Work</SectionLabel>
-              <h2 className="font-heading text-3xl tracking-[-0.06em] text-foreground sm:text-4xl">
-                Selected work
-              </h2>
-              <p className="max-w-sm text-sm leading-7 text-muted-foreground">
-                A few areas where I have had direct responsibility in
-                production.
-              </p>
+              <RouteTrace className="motion-safe:animate-rise motion-safe:[animation-delay:240ms]" />
             </div>
+          </div>
+        </section>
 
-            <ul className="flex flex-col gap-8">
-              {impactItems.map((item) => (
-                <li key={item.id} className="border-t border-border/70 pt-6">
-                  <article className="grid gap-4 md:grid-cols-[14rem_minmax(0,1fr)] md:gap-8">
-                    <SectionLabel>{item.label}</SectionLabel>
-                    <div className="flex flex-col gap-3">
-                      <h3 className="font-heading text-2xl tracking-[-0.05em] text-balance text-foreground">
-                        {item.title}
-                      </h3>
-                      <p className="max-w-3xl text-sm leading-7 text-muted-foreground sm:text-base">
-                        {item.description}
+        <section aria-label="Focus areas">
+          <div className={shell}>
+            <ul className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 xl:grid-cols-4">
+              {proofPoints.map(
+                ({ id, value, label, description, Icon }, index) => (
+                  <li
+                    key={id}
+                    className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 bg-background p-5 sm:flex sm:flex-col sm:gap-5 sm:p-7"
+                  >
+                    <div className="flex items-start justify-between sm:items-center">
+                      <span className="flex size-10 items-center justify-center rounded-xl border border-border bg-card text-primary">
+                        <Icon className="size-[1.1rem]" aria-hidden="true" />
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        className="hidden font-mono text-[0.68rem] text-muted-foreground/70 tabular-nums sm:inline"
+                      >
+                        {pad(index + 1)}
+                      </span>
+                    </div>
+                    <div className="flex flex-col gap-3 sm:gap-5">
+                      <div className="flex flex-col gap-1 sm:gap-1.5">
+                        <p className="font-heading text-xl font-medium tracking-[-0.04em] text-foreground sm:text-2xl">
+                          {value}
+                        </p>
+                        <p className="text-sm font-medium text-foreground/85">
+                          {label}
+                        </p>
+                      </div>
+                      <p className="text-sm leading-6 text-muted-foreground">
+                        {description}
                       </p>
                     </div>
-                  </article>
-                </li>
-              ))}
+                  </li>
+                ),
+              )}
             </ul>
-          </section>
+          </div>
+        </section>
 
-          <SectionRule />
+        <section
+          id="impact"
+          className={cn(sectionScrollOffset, "pt-24 sm:pt-32")}
+        >
+          <div className={shell}>
+            <SectionMarker index={sectionIndex("impact")}>Work</SectionMarker>
+            <div className="mt-10 grid gap-x-16 gap-y-10 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]">
+              <div className="flex flex-col gap-4 lg:sticky lg:top-28 lg:self-start">
+                <h2 className={sectionHeading}>Selected work</h2>
+                <p className="max-w-sm text-base leading-7 text-muted-foreground">
+                  A few areas where I have had direct responsibility in
+                  production.
+                </p>
+              </div>
 
-          <section
-            id="capabilities"
-            className={`grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] ${sectionScrollOffset}`}
-          >
-            <div className="flex max-w-xl flex-col gap-4">
-              <SectionLabel>Stack</SectionLabel>
-              <h2 className="font-heading text-3xl tracking-[-0.06em] text-foreground sm:text-4xl">
+              <ol className="divide-y divide-border border-y border-border">
+                {impactItems.map((item, index) => (
+                  <li key={item.id} className="py-8 sm:py-10">
+                    <article className="grid gap-4 sm:grid-cols-[3.5rem_minmax(0,1fr)]">
+                      <span
+                        aria-hidden="true"
+                        className="hidden font-mono text-sm text-primary tabular-nums sm:block sm:pt-0.5"
+                      >
+                        {pad(index + 1)}
+                      </span>
+                      <div className="flex flex-col gap-3">
+                        <SectionLabel
+                          index={pad(index + 1)}
+                          indexClassName="sm:hidden"
+                        >
+                          {item.label}
+                        </SectionLabel>
+                        <h3 className="font-heading text-2xl font-medium tracking-[-0.035em] text-balance text-foreground sm:text-[1.9rem] sm:leading-tight">
+                          {item.title}
+                        </h3>
+                        <p className="max-w-2xl text-base leading-7 text-muted-foreground">
+                          {item.description}
+                        </p>
+                      </div>
+                    </article>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="capabilities"
+          className={cn(sectionScrollOffset, "pt-24 sm:pt-32")}
+        >
+          <div className={shell}>
+            <SectionMarker index={sectionIndex("capabilities")}>
+              Stack
+            </SectionMarker>
+            <div className="mt-10 grid gap-x-16 gap-y-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-end">
+              <h2 className={cn(sectionHeading, "max-w-3xl")}>
                 Networks, systems, security, and delivery.
               </h2>
-              <p className="text-sm leading-7 text-muted-foreground sm:text-base">
+              <p className="max-w-sm text-base leading-7 text-muted-foreground">
                 New tools when they fit the environment. Older ones when they
                 still earn their place.
               </p>
             </div>
 
-            <div className="grid gap-x-6 gap-y-6 sm:grid-cols-2">
+            <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
               {capabilityGroups.map((group) => (
                 <section
                   key={group.id}
                   aria-label={group.title}
-                  className="border-t border-border/70 pt-5"
+                  className="flex flex-col gap-5 bg-background p-6 sm:p-7"
                 >
-                  <h3 className="font-heading text-xl tracking-[-0.05em] text-foreground">
-                    {group.title}
-                  </h3>
-                  <ul className="mt-4 flex flex-col gap-2 text-sm leading-6 text-muted-foreground">
+                  <div className="flex items-baseline justify-between gap-4 border-b border-border pb-4">
+                    <h3 className="font-heading text-xl font-medium tracking-[-0.03em] text-foreground">
+                      {group.title}
+                    </h3>
+                    <span
+                      aria-hidden="true"
+                      className="font-mono text-[0.68rem] text-muted-foreground/70 tabular-nums"
+                    >
+                      {pad(group.items.length)}
+                    </span>
+                  </div>
+                  <ul className="flex flex-wrap gap-2">
                     {group.items.map((item) => (
-                      <li key={item}>{item}</li>
+                      <li
+                        key={item}
+                        className="rounded-md border border-border bg-muted/50 px-2.5 py-1 font-mono text-[0.75rem] text-foreground/85"
+                      >
+                        {item}
+                      </li>
                     ))}
                   </ul>
                 </section>
               ))}
             </div>
-          </section>
+          </div>
+        </section>
 
-          <SectionRule />
+        <section
+          id="approach"
+          className={cn(
+            sectionScrollOffset,
+            "mt-24 border-y border-border bg-card/40 sm:mt-32",
+          )}
+        >
+          <div className={cn(shell, "py-20 sm:py-28")}>
+            <SectionMarker index={sectionIndex("approach")}>
+              Approach
+            </SectionMarker>
+            <div className="mt-10 grid gap-14 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] lg:gap-20">
+              <div className="flex flex-col gap-6">
+                <h2 className="font-heading text-[clamp(2.75rem,6.5vw,5.5rem)] leading-[0.95] font-medium tracking-[-0.05em] text-balance text-foreground">
+                  Practical infrastructure work.
+                </h2>
+                <p className="max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
+                  My background is in networks, systems, and security. I also
+                  build small APIs and deployment tooling where it makes the
+                  core work easier.
+                </p>
+              </div>
 
-          <section
-            id="approach"
-            className={`grid gap-10 lg:grid-cols-[minmax(0,1fr)_20rem] ${sectionScrollOffset}`}
-          >
-            <div className="flex max-w-3xl flex-col gap-4">
-              <SectionLabel>Approach</SectionLabel>
-              <h2 className="font-heading text-3xl tracking-[-0.06em] text-foreground sm:text-4xl">
-                Practical infrastructure work.
-              </h2>
-              <p className="text-sm leading-7 text-muted-foreground sm:text-base">
-                My background is in networks, systems, and security. I also
-                build small APIs and deployment tooling where it makes the core
-                work easier.
-              </p>
+              <ol className="flex flex-col gap-10 self-end pl-9">
+                <li className="relative">
+                  {/* Link to the next node: from this node's bottom edge,
+                      across the gap-10, to the next node's top edge. */}
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-3 -bottom-[2.625rem] -left-[1.9375rem] w-px -translate-x-1/2 bg-linear-to-b from-muted-foreground/40 to-primary/80"
+                  />
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-0.5 -left-9 size-2.5 rounded-full border-[1.5px] border-muted-foreground/60 bg-background"
+                  />
+                  <SectionLabel>Path</SectionLabel>
+                  <p className="mt-3 text-base leading-7 text-muted-foreground">
+                    I started on the service desk and moved into infrastructure,
+                    security, and systems work. Same thread throughout: better
+                    access, tighter controls, systems that stay out of the way.
+                  </p>
+                </li>
+                <li className="relative">
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-0.5 -left-9 size-2.5 rounded-full bg-primary shadow-[0_0_0_4px_var(--glow)]"
+                  />
+                  <SectionLabel className="text-primary">Current</SectionLabel>
+                  <p className="mt-3 text-base leading-7 text-foreground/90">
+                    Running production infrastructure and building the tooling
+                    that supports it.
+                  </p>
+                </li>
+              </ol>
             </div>
-            <div className="flex flex-col gap-3 border-t border-border/70 pt-5">
-              <SectionLabel>Current</SectionLabel>
-              <p className="text-sm leading-7 text-muted-foreground">
-                Running production infrastructure and building the tooling that
-                supports it.
-              </p>
-            </div>
-          </section>
+          </div>
+        </section>
 
-          <SectionRule />
-
-          <section
-            id="contact"
-            className={`grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] ${sectionScrollOffset}`}
-          >
-            <div className="flex flex-col gap-4">
-              <SectionLabel>Contact</SectionLabel>
-              <h2 className="font-heading text-3xl tracking-[-0.06em] text-foreground sm:text-4xl">
-                Get in touch
-              </h2>
-              <p className="max-w-xl text-sm leading-7 text-muted-foreground sm:text-base">
-                If you are hiring for infrastructure, security, systems, or
-                technical operations, feel free to get in touch — happy to share
-                my resume and references on request. Not hiring? Still happy to
-                talk tech and AI.
-              </p>
-            </div>
-            <div className="rounded-[1.75rem] border border-border/70 bg-card/70 p-5 sm:p-7">
+        <section
+          id="contact"
+          className={cn(sectionScrollOffset, "py-24 sm:py-32")}
+        >
+          <div className={shell}>
+            <SectionMarker index={sectionIndex("contact")}>
+              Contact
+            </SectionMarker>
+            <div className="mt-10 grid gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16">
+              <div className="flex flex-col gap-5">
+                <h2 className="font-heading text-[clamp(2.75rem,6vw,5rem)] leading-[0.95] font-medium tracking-[-0.05em] text-foreground">
+                  Get in touch
+                </h2>
+                <p className="max-w-md text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
+                  If you are hiring for infrastructure, security, systems, or
+                  technical operations, feel free to get in touch — happy to
+                  share my resume and references on request. Not hiring? Still
+                  happy to talk tech and AI.
+                </p>
+              </div>
               <ContactForm />
             </div>
-          </section>
-        </div>
+          </div>
+        </section>
       </main>
 
-      <footer className="border-t border-border/70">
-        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-3 px-6 py-8 text-xs text-muted-foreground sm:flex-row sm:items-center sm:px-8 lg:px-12">
-          <p>&copy; {new Date().getFullYear()} James Cadena</p>
-          <PopChip />
-          <a
-            href="https://github.com/j-cadena-g/cadena-sh"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`inline-flex items-center gap-1.5 rounded-sm transition-colors hover:text-foreground ${focusRing}`}
+      <footer className="border-t border-border">
+        <div className={cn(shell, "flex flex-col gap-10 pt-14 pb-8")}>
+          <p
+            aria-hidden="true"
+            className="pb-[0.06em] font-heading text-[clamp(3.5rem,15vw,13rem)] leading-[0.8] font-medium tracking-[-0.06em] text-transparent select-none *:bg-clip-text"
           >
-            Source
-            <ArrowUpRight className="size-3.5" aria-hidden="true" />
-          </a>
+            <span className="bg-linear-to-b from-foreground/[0.14] to-foreground/0">
+              cadena
+            </span>
+            <span className="bg-linear-to-b from-primary/40 to-primary/0">
+              .sh
+            </span>
+          </p>
+          <div className="flex flex-col items-start justify-between gap-4 text-xs text-muted-foreground sm:flex-row sm:items-center">
+            <p>&copy; {new Date().getFullYear()} James Cadena</p>
+            <PopChip />
+            <a
+              href={SOURCE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`inline-flex items-center gap-1.5 rounded-sm transition-colors hover:text-foreground ${focusRing}`}
+            >
+              Source
+              <ArrowUpRight className="size-3.5" aria-hidden="true" />
+            </a>
+          </div>
         </div>
       </footer>
     </div>

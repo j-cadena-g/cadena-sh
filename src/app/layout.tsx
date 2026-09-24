@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
-import { Manrope, Space_Grotesk } from "next/font/google";
+import { JetBrains_Mono, Manrope, Space_Grotesk } from "next/font/google";
 import { headers } from "next/headers";
 import { ThemeProvider } from "@/components/theme-provider";
 import { CANONICAL_ORIGIN } from "@/lib/site";
@@ -19,6 +19,11 @@ const manrope = Manrope({
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-display",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-code",
 });
 
 export const viewport: Viewport = {
@@ -71,7 +76,11 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={cn(manrope.variable, spaceGrotesk.variable)}
+      className={cn(
+        manrope.variable,
+        spaceGrotesk.variable,
+        jetbrainsMono.variable,
+      )}
       suppressHydrationWarning
     >
       <body className="min-h-screen">
