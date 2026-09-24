@@ -14,9 +14,11 @@ beforeEach(() => {
       { status: 200 },
     ),
   );
-  vi.spyOn(performance, "getEntriesByType").mockReturnValue([
+  // Stamped when the buffer is read, i.e. after the lookup began.
+  vi.spyOn(performance, "getEntriesByType").mockImplementation(() => [
     {
       name: "http://localhost/api/pop",
+      startTime: performance.now(),
       requestStart: 10,
       responseEnd: 33,
       duration: 23,
@@ -41,6 +43,9 @@ describe("RouteTrace", () => {
     await waitFor(() => {
       expect(trace).toHaveTextContent(/live/i);
     });
+    expect(within(trace).getByRole("status")).toHaveTextContent(
+      "Connection traced",
+    );
 
     const hops = within(trace).getAllByRole("listitem");
     expect(hops).toHaveLength(3);
@@ -88,6 +93,9 @@ describe("RouteTrace", () => {
     await waitFor(() => {
       expect(trace).toHaveTextContent(/unavailable/i);
     });
+    expect(within(trace).getByRole("status")).toHaveTextContent(
+      "Connection trace unavailable",
+    );
     expect(within(trace).getAllByText("—")).toHaveLength(3);
   });
 });

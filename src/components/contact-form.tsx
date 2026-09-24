@@ -252,7 +252,9 @@ export function ContactForm() {
             </FieldContent>
           </Field>
 
-          <Field className="sr-only">
+          {/* Honeypot: filled submissions are silently dropped by the API,
+              so keep it away from screen readers as well as the tab order. */}
+          <Field className="sr-only" aria-hidden="true">
             <FieldLabel htmlFor="website">Website</FieldLabel>
             <FieldContent>
               <Input

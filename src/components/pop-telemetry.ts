@@ -42,6 +42,7 @@ function isPopPayload(value: unknown): value is PopPayload {
 
 function findLatestPopEntry(
   endpoint: string,
+  notBefore: number,
 ): PerformanceResourceTiming | null {
   if (typeof performance === "undefined") {
     return null;
@@ -54,7 +55,7 @@ function findLatestPopEntry(
 
     for (let i = entries.length - 1; i >= 0; i--) {
       const entry = entries[i];
-      if (entry.name.endsWith(endpoint)) {
+      if (entry.startTime >= notBefore && entry.name.endsWith(endpoint)) {
         return entry;
       }
     }
@@ -67,13 +68,19 @@ function findLatestPopEntry(
 
 /**
  * Reads transfer timing + negotiated protocol from the most recent
- * `/api/pop` PerformanceResourceTiming entry.
+ * `/api/pop` PerformanceResourceTiming entry that started at or after
+ * `notBefore`. An earlier lookup's entry stays in the buffer after a remount,
+ * and the current request's entry may not be buffered yet, so without the
+ * cutoff a stale entry could be read as this one.
  *
  * Prefers `responseEnd - requestStart` (network RTT-ish) over wall-clock
  * `performance.now()` spans, which also include JSON parse and React work.
  */
-export function readPopResourceTiming(endpoint: string): PopResourceTiming {
-  const entry = findLatestPopEntry(endpoint);
+export function readPopResourceTiming(
+  endpoint: string,
+  notBefore = 0,
+): PopResourceTiming {
+  const entry = findLatestPopEntry(endpoint, notBefore);
 
   if (!entry) {
     return { latencyMs: null, protocol: null };
@@ -166,7 +173,7 @@ function startLookup() {
         return;
       }
 
-      const timing = readPopResourceTiming(POP_ENDPOINT);
+      const timing = readPopResourceTiming(POP_ENDPOINT, start);
       const wallClockMs = Math.max(0, Math.round(end - start));
 
       publish({

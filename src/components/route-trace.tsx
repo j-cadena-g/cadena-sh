@@ -74,6 +74,14 @@ const STATUS_LABEL: Record<PopState["status"], string> = {
   error: "unavailable",
 };
 
+// What assistive technology hears when the status changes; the terse visual
+// label means little read out on its own.
+const STATUS_ANNOUNCEMENT: Record<PopState["status"], string> = {
+  loading: "Tracing your connection",
+  ready: "Connection traced",
+  error: "Connection trace unavailable",
+};
+
 function RouteTrace({ className }: { className?: string }) {
   const state = usePopTelemetry();
   const titleId = useId();
@@ -94,7 +102,7 @@ function RouteTrace({ className }: { className?: string }) {
           Trace <span className="text-muted-foreground/50">·</span> your
           connection
         </span>
-        <span className="flex items-center gap-1.5">
+        <span role="status" className="flex items-center gap-1.5">
           <span
             aria-hidden="true"
             className={cn(
@@ -105,7 +113,8 @@ function RouteTrace({ className }: { className?: string }) {
               state.status === "error" && "bg-destructive/70",
             )}
           />
-          {STATUS_LABEL[state.status]}
+          <span aria-hidden="true">{STATUS_LABEL[state.status]}</span>
+          <span className="sr-only">{STATUS_ANNOUNCEMENT[state.status]}</span>
         </span>
       </figcaption>
 

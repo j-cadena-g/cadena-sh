@@ -11,7 +11,6 @@ const BACKGROUND = "#050505";
 const FOREGROUND = "#f3f2ee";
 const MUTED = "#a3a19f";
 const FAINT = "#6f6c69";
-const GRID_LINE = "rgba(255, 244, 230, 0.06)";
 
 export const alt = "James Cadena — Network & Security Engineer";
 export const size = {
@@ -21,6 +20,8 @@ export const size = {
 export const contentType = "image/png";
 
 const GRID_SIZE = 64;
+const GRID_RGB = "255, 244, 230";
+const GRID_ALPHA = 0.08;
 
 const hops = [
   { kind: "CLIENT", value: "you" },
@@ -28,7 +29,9 @@ const hops = [
   { kind: "ORIGIN", value: "james.cadena.sh" },
 ];
 
-// Explicit 1px lines: Satori doesn't tile multi-layer gradient backgrounds.
+// The grid is drawn as explicit 1px lines, each faded by its own linear
+// gradient, rather than masked by a radial vignette: Satori ignores the
+// `inset` shorthand and sizes radial gradients differently from browsers.
 const gridColumns = Array.from(
   { length: Math.floor(size.width / GRID_SIZE) },
   (_, index) => (index + 1) * GRID_SIZE,
@@ -37,6 +40,22 @@ const gridRows = Array.from(
   { length: Math.floor(size.height / GRID_SIZE) },
   (_, index) => (index + 1) * GRID_SIZE,
 );
+
+function gridColor(alpha: number) {
+  return `rgba(${GRID_RGB}, ${alpha.toFixed(3)})`;
+}
+
+// Strongest at the top centre, fading towards the sides and the bottom.
+function columnGradient(x: number) {
+  const fromCentre = Math.abs(x - size.width / 2) / (size.width / 2);
+  const alpha = GRID_ALPHA * (1 - 0.7 * fromCentre ** 2);
+  return `linear-gradient(to bottom, ${gridColor(alpha)}, ${gridColor(0)} 85%)`;
+}
+
+function rowGradient(y: number) {
+  const alpha = GRID_ALPHA * Math.max(0, 1 - y / (size.height * 0.85));
+  return `linear-gradient(to right, ${gridColor(0)}, ${gridColor(alpha)} 50%, ${gridColor(0)})`;
+}
 
 export default function OpenGraphImage() {
   return new ImageResponse(
@@ -51,7 +70,7 @@ export default function OpenGraphImage() {
         fontFamily: "sans-serif",
       }}
     >
-      {/* Blueprint grid, faded out towards the edges by the vignette below. */}
+      {/* Blueprint grid. */}
       {gridColumns.map((x) => (
         <div
           key={`x${x}`}
@@ -61,7 +80,7 @@ export default function OpenGraphImage() {
             bottom: 0,
             left: x,
             width: 1,
-            background: GRID_LINE,
+            backgroundImage: columnGradient(x),
           }}
         />
       ))}
@@ -74,20 +93,12 @@ export default function OpenGraphImage() {
             right: 0,
             top: y,
             height: 1,
-            background: GRID_LINE,
+            backgroundImage: rowGradient(y),
           }}
         />
       ))}
-      {/* Satori reads a leading bare size keyword as a colour stop, so every
-          radial gradient here names its shape first. */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          display: "flex",
-          backgroundImage: `radial-gradient(ellipse 75% 85% at 50% 0%, rgba(5, 5, 5, 0) 35%, ${BACKGROUND} 100%)`,
-        }}
-      />
+      {/* Satori reads a leading bare size keyword as a colour stop, so the
+          glow's radial gradient names its shape first. */}
       <div
         style={{
           position: "absolute",
