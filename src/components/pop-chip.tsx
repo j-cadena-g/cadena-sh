@@ -3,125 +3,13 @@
 import { ChevronUp } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 
+import {
+  formatProtocol,
+  formatRegion,
+  type PopPayload,
+  usePopTelemetry,
+} from "@/components/pop-telemetry";
 import { cn } from "@/lib/utils";
-
-const POP_ENDPOINT = "/api/pop";
-
-/** Abort the edge POP lookup if it hangs longer than this. */
-const POP_FETCH_TIMEOUT_MS = 10_000;
-
-type PopPayload = {
-  region: string;
-  city: string | null;
-  country: string | null;
-};
-
-export type PopResourceTiming = {
-  latencyMs: number | null;
-  protocol: string | null;
-};
-
-function isPopPayload(value: unknown): value is PopPayload {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-
-  const payload = value as Record<string, unknown>;
-
-  return (
-    typeof payload.region === "string" &&
-    (payload.city === null || typeof payload.city === "string") &&
-    (payload.country === null || typeof payload.country === "string")
-  );
-}
-
-type PopState =
-  | { status: "loading" }
-  | {
-      status: "ready";
-      data: PopPayload;
-      latencyMs: number;
-      protocol: string | null;
-    }
-  | { status: "error" };
-
-function findLatestPopEntry(
-  endpoint: string,
-): PerformanceResourceTiming | null {
-  if (typeof performance === "undefined") {
-    return null;
-  }
-
-  try {
-    const entries = performance.getEntriesByType(
-      "resource",
-    ) as PerformanceResourceTiming[];
-
-    for (let i = entries.length - 1; i >= 0; i--) {
-      const entry = entries[i];
-      if (entry.name.endsWith(endpoint)) {
-        return entry;
-      }
-    }
-  } catch {
-    // Performance APIs throw on some hardened browsers.
-  }
-
-  return null;
-}
-
-/**
- * Reads transfer timing + negotiated protocol from the most recent
- * `/api/pop` PerformanceResourceTiming entry.
- *
- * Prefers `responseEnd - requestStart` (network RTT-ish) over wall-clock
- * `performance.now()` spans, which also include JSON parse and React work.
- */
-export function readPopResourceTiming(endpoint: string): PopResourceTiming {
-  const entry = findLatestPopEntry(endpoint);
-
-  if (!entry) {
-    return { latencyMs: null, protocol: null };
-  }
-
-  let latencyMs: number | null = null;
-
-  if (entry.requestStart > 0 && entry.responseEnd >= entry.requestStart) {
-    latencyMs = Math.max(0, Math.round(entry.responseEnd - entry.requestStart));
-  } else if (entry.duration > 0) {
-    latencyMs = Math.max(0, Math.round(entry.duration));
-  }
-
-  return {
-    latencyMs,
-    protocol: entry.nextHopProtocol || null,
-  };
-}
-
-export function formatProtocol(protocol: string | null): string | null {
-  if (!protocol) {
-    return null;
-  }
-
-  const normalized = protocol.toLowerCase();
-
-  if (normalized === "h3" || normalized === "h2") {
-    return normalized;
-  }
-
-  if (normalized.startsWith("http/")) {
-    return `h${normalized.slice(5)}`;
-  }
-
-  return normalized;
-}
-
-function formatRegion(region: string): string {
-  if (!region || region === "local") {
-    return "local";
-  }
-  return region;
-}
 
 type DetailRow = {
   label: string;
@@ -159,67 +47,10 @@ function buildDetailRows({
 }
 
 export function PopChip({ className }: { className?: string }) {
-  const [state, setState] = useState<PopState>({ status: "loading" });
+  const state = usePopTelemetry();
   const [expanded, setExpanded] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const panelId = useId();
-
-  useEffect(() => {
-    const controller = new AbortController();
-    let disposed = false;
-    const start =
-      typeof performance !== "undefined" ? performance.now() : Date.now();
-
-    const timeoutId = setTimeout(() => {
-      controller.abort();
-    }, POP_FETCH_TIMEOUT_MS);
-
-    fetch(POP_ENDPOINT, { cache: "no-store", signal: controller.signal })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error(`Unexpected status ${response.status}`);
-        }
-
-        const payload: unknown = await response.json();
-        const end =
-          typeof performance !== "undefined" ? performance.now() : Date.now();
-
-        if (!isPopPayload(payload)) {
-          throw new Error("Unexpected /api/pop payload shape");
-        }
-
-        clearTimeout(timeoutId);
-
-        if (disposed) {
-          return;
-        }
-
-        const timing = readPopResourceTiming(POP_ENDPOINT);
-        const wallClockMs = Math.max(0, Math.round(end - start));
-
-        setState({
-          status: "ready",
-          data: payload,
-          latencyMs: timing.latencyMs ?? wallClockMs,
-          protocol: timing.protocol,
-        });
-      })
-      .catch(() => {
-        clearTimeout(timeoutId);
-
-        if (disposed) {
-          return;
-        }
-
-        setState({ status: "error" });
-      });
-
-    return () => {
-      disposed = true;
-      controller.abort();
-      clearTimeout(timeoutId);
-    };
-  }, []);
 
   useEffect(() => {
     if (!expanded) {
@@ -255,7 +86,7 @@ export function PopChip({ className }: { className?: string }) {
   }, [expanded]);
 
   const baseClasses = cn(
-    "inline-flex items-center gap-2 rounded-full border border-border/70 bg-muted/40 px-2.5 py-1 font-mono text-[0.62rem] tracking-[0.18em] uppercase text-muted-foreground",
+    "inline-flex items-center gap-2 rounded-full border border-border/70 bg-muted/40 px-2.5 py-1 font-mono text-[0.68rem] text-muted-foreground",
     className,
   );
 

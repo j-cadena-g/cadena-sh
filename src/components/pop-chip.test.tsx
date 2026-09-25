@@ -1,19 +1,19 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import {
-  formatProtocol,
-  PopChip,
-  readPopResourceTiming,
-} from "./pop-chip";
+import { PopChip } from "./pop-chip";
+import { formatProtocol, readPopResourceTiming } from "./pop-telemetry";
 
 const fetchMock = vi.fn<typeof fetch>();
 
 function stubResourceTiming(
   entry: Partial<PerformanceResourceTiming> & { name: string },
 ) {
-  vi.spyOn(performance, "getEntriesByType").mockReturnValue([
-    entry as PerformanceResourceTiming,
+  // Real entries carry their request's start time. Stamping the clock when
+  // the buffer is read places the entry after the lookup began, unless a
+  // test pins `startTime` to model an earlier request.
+  vi.spyOn(performance, "getEntriesByType").mockImplementation(() => [
+    { startTime: performance.now(), ...entry } as PerformanceResourceTiming,
   ]);
 }
 
@@ -73,6 +73,26 @@ describe("readPopResourceTiming", () => {
 
     expect(readPopResourceTiming("/api/pop")).toEqual({
       latencyMs: 37,
+      protocol: "h2",
+    });
+  });
+
+  it("ignores entries that started before the cutoff", () => {
+    stubResourceTiming({
+      name: "https://james.cadena.sh/api/pop",
+      startTime: 10,
+      requestStart: 12,
+      responseEnd: 40,
+      duration: 30,
+      nextHopProtocol: "h2",
+    });
+
+    expect(readPopResourceTiming("/api/pop", 50)).toEqual({
+      latencyMs: null,
+      protocol: null,
+    });
+    expect(readPopResourceTiming("/api/pop", 10)).toEqual({
+      latencyMs: 28,
       protocol: "h2",
     });
   });
@@ -148,6 +168,45 @@ describe("PopChip", () => {
     await waitFor(() => {
       expect(screen.getByText("75ms")).toBeInTheDocument();
     });
+  });
+
+  it("ignores an earlier request's timing entry after a remount", async () => {
+    // Only the previous lookup's entry is buffered; this request's hasn't
+    // landed yet, so its stale RTT and protocol must not be reported.
+    stubResourceTiming({
+      name: "http://localhost/api/pop",
+      startTime: 50,
+      requestStart: 51,
+      responseEnd: 950,
+      duration: 899,
+      nextHopProtocol: "h2",
+    });
+
+    let resolveFetch: ((value: Response) => void) | undefined;
+    fetchMock.mockImplementationOnce(
+      () =>
+        new Promise<Response>((resolve) => {
+          resolveFetch = resolve;
+        }),
+    );
+
+    const nowSpy = vi.spyOn(performance, "now").mockReturnValue(100);
+
+    render(<PopChip />);
+
+    nowSpy.mockReturnValue(175);
+    resolveFetch!(
+      new Response(
+        JSON.stringify({ region: "iad1", city: null, country: null }),
+        { status: 200 },
+      ),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("75ms")).toBeInTheDocument();
+    });
+    expect(screen.queryByText("899ms")).not.toBeInTheDocument();
+    expect(screen.queryByText("h2")).not.toBeInTheDocument();
   });
 
   it("expands telemetry details on click and closes on Escape", async () => {

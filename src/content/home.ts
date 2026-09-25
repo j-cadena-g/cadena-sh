@@ -1,4 +1,11 @@
 import type { ComponentType, SVGProps } from "react";
+import {
+  Braces,
+  Fingerprint,
+  type LucideIcon,
+  Network,
+  Route,
+} from "lucide-react";
 
 import { GithubLight } from "@/components/ui/svgs/github-light";
 import { Linkedin } from "@/components/ui/svgs/linkedin";
@@ -9,6 +16,7 @@ export type ProofPoint = {
   value: string;
   label: string;
   description: string;
+  Icon: LucideIcon;
 };
 
 export type ImpactItem = {
@@ -37,24 +45,28 @@ export const proofPoints: ProofPoint[] = [
     value: "Multi-site",
     label: "Distributed networks",
     description: "Secure connectivity and policy across production sites.",
+    Icon: Network,
   },
   {
     id: "zero-trust",
     value: "Zero Trust",
     label: "Identity-based access",
     description: "Remote access with less public exposure.",
+    Icon: Fingerprint,
   },
   {
     id: "sd-wan",
     value: "SD-WAN",
     label: "Network performance",
     description: "Better latency, stronger resilience, cleaner failover.",
+    Icon: Route,
   },
   {
     id: "edge-serverless",
     value: "Edge APIs",
     label: "Platforms and APIs",
     description: "Small APIs, edge logic, and deployment workflows.",
+    Icon: Braces,
   },
 ];
 

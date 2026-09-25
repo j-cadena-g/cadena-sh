@@ -174,4 +174,15 @@ describe("ContactForm", () => {
       screen.getByText(/i will follow up when i can/i),
     ).toBeInTheDocument();
   });
+
+  it("keeps the honeypot field away from keyboard and screen reader users", () => {
+    render(<ContactForm />);
+
+    // A filled honeypot is silently dropped by the API, so nobody using
+    // assistive technology should be able to reach it.
+    expect(
+      screen.queryByRole("textbox", { name: /website/i }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/website/i)).toHaveAttribute("tabindex", "-1");
+  });
 });

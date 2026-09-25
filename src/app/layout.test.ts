@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("next/font/google", () => ({
+  JetBrains_Mono: () => ({ variable: "--font-code" }),
   Manrope: () => ({ variable: "--font-body" }),
   Space_Grotesk: () => ({ variable: "--font-display" }),
 }));
