@@ -1,137 +1,76 @@
 # cadena.sh
 
 [![CI](https://github.com/j-cadena-g/cadena-sh/actions/workflows/ci.yaml/badge.svg)](https://github.com/j-cadena-g/cadena-sh/actions/workflows/ci.yaml)
-![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/j-cadena-g/cadena-sh?utm_source=oss&utm_medium=github&utm_campaign=j-cadena-g%2Fcadena-sh&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-[![Node.js](https://img.shields.io/badge/node-24.x-green?logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js&logoColor=white)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel&logoColor=white)](https://james.cadena.sh)
 
-Source for my personal site, built for [james.cadena.sh](https://james.cadena.sh). I'm a network and security engineer, so the infra choices here (1Password-backed secrets, a pinned `op` CLI, Vercel BotID on the contact form, a nonce-based CSP, and a tiny edge POP status chip) reflect that background more than the frontend does. It's one page with a contact form.
+Source for [james.cadena.sh](https://james.cadena.sh), my personal site. It's one page with a contact form and a live trace of your connection through Vercel's edge.
 
 ![cadena.sh hero](./docs/screenshots/hero-desktop.png)
 
 ## Stack
 
-- Next.js App Router (Next 16, React 19)
-- Tailwind CSS v4, shadcn/ui
-- Resend for the contact form
-- Vercel BotID for abuse protection
-- Vercel Analytics + Speed Insights
-- Nonce-based CSP via a Next.js proxy
-- `/api/pop` footer chip for edge region, latency, and protocol visibility
-- Vitest + Testing Library
-- GitHub Actions CI + Dependabot
-- 1Password Environments for build-time and runtime secrets
-- Configured for Vercel deployment
+- Next.js 16 (App Router), React 19, Tailwind CSS v4, shadcn/ui
+- Resend for the contact form, Vercel BotID for bot protection
+- Nonce-based CSP from `src/proxy.ts`
+- 1Password Environments for secrets at build time and runtime
+- Vitest and Testing Library, CI on GitHub Actions, Dependabot
 
 ## Run it locally
 
 ```bash
 pnpm install
-```
-
-**With 1Password Environments (optional).** Create a 1Password Environment in your own account that holds the contact-form variables below. Copy [`.op/refs.env.example`](./.op/refs.env.example) to `.op/refs.env` and paste that Environment's UUID into `CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID`. Find the UUID in 1Password under Developer → Environments → Manage environment. With 1Password unlocked and the desktop `op` CLI available:
-
-```bash
-pnpm dev:op
-```
-
-This wraps `next dev` with `op run`, injecting secrets once at launch. There is no FIFO `.env.local` mount, so Next.js file watchers stay stable. Shell exports of `CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID` override the file when set. `OP_ENVIRONMENT_ID` is reserved for Vercel build/deploy.
-
-**Without 1Password.** Copy `.env.example` to `.env.local`, fill in the values, and run:
-
-```bash
+cp .env.example .env.local   # fill in the values below
 pnpm dev
 ```
 
-The contact form expects these values, either from a 1Password Environment (via `dev:op`) or from direct local environment variables:
+The contact form needs:
 
 ```bash
 RESEND_API_KEY       # Resend API key
-RESEND_FROM_EMAIL    # must live on a domain verified in Resend
+RESEND_FROM_EMAIL    # must be on a domain verified in Resend, or sends fail with a 500
 RESEND_FROM_NAME     # display name for the From header
-CONTACT_EMAIL_TO     # inbox that receives contact submissions
+CONTACT_EMAIL_TO     # inbox that receives submissions
 ```
 
-`RESEND_FROM_EMAIL` has to be on a domain you have verified in the Resend dashboard. Otherwise Resend rejects the send at runtime and the contact form will surface a 500.
+To load them from a 1Password Environment instead, copy [`.op/refs.env.example`](./.op/refs.env.example) to `.op/refs.env`, set `CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID` to the Environment's UUID (Developer → Environments → Manage environment), and run `pnpm dev:op`. It wraps `next dev` in `op run`; don't mount `.env.local` as a FIFO instead, since that sends the Next.js file watcher into a restart loop. `OP_ENVIRONMENT_ID` is reserved for Vercel.
 
-See [Secrets](#secrets) for the production source-of-truth model.
-
-If you're running your own fork, you can also set `NEXT_PUBLIC_SITE_URL` (and optionally `NEXT_PUBLIC_APEX_URL`) to override the canonical origin used in metadata, `robots.txt`, `sitemap.xml`, and the contact route allowlist.
-
-Open [http://localhost:3000](http://localhost:3000).
-
-## Secrets
-
-Secrets can be managed in **1Password Environments** you create in your own account.
-
-**Local dev.** If you use 1Password, `pnpm dev:op` reads `CADENA_SH_DEV_1PASSWORD_ENVIRONMENT_ID` from gitignored `.op/refs.env` (see [`.op/refs.env.example`](./.op/refs.env.example)) and wraps `next dev` with `op run`. Point that variable at an Environment in your account that contains the contact-form variables. Do not use a FIFO-mounted `.env.local` with Next.js. File watchers can restart in a loop. Otherwise copy `.env.example` to `.env.local`.
-
-**Production (Vercel).** When 1Password is the source of truth for contact-form secrets, Vercel stores only:
-
-- `OP_SERVICE_ACCOUNT_TOKEN`: a scoped service account token with read-only access to the Environment you configure
-- `OP_ENVIRONMENT_ID`: the ID of that 1Password Environment
-
-Build-time and runtime use different 1Password integrations:
-
-1. `pnpm build:vercel` runs `scripts/install-op.sh` to fetch a pinned `op` CLI beta into `./bin/op`.
-2. The installer verifies the downloaded archive against a pinned SHA-256 for the current platform.
-3. The build command wraps `next build` with `op run --environment "$OP_ENVIRONMENT_ID"`, injecting the Environment values for the duration of the build subprocess.
-4. The `POST /api/contact` runtime uses the beta `@1password/sdk` Environments API to read the same Environment with `OP_SERVICE_ACCOUNT_TOKEN` and `OP_ENVIRONMENT_ID`. It fails fast if the Environment read times out, and caches successfully resolved contact mail config for the warm function instance.
-
-The beta CLI is required because `op run --environment` for 1Password Environments is still beta. The beta JavaScript SDK is required because programmatic reads from 1Password Environments are still beta. Versions and per-platform SHA-256 values are pinned where possible for reproducibility and integrity. If `OP_VERSION` changes before `scripts/install-op.sh` is updated, the build fails closed unless you also provide a verified `OP_SHA256`.
+Forks can set `NEXT_PUBLIC_SITE_URL` (and optionally `NEXT_PUBLIC_APEX_URL`) to change the canonical origin used in metadata, `robots.txt`, `sitemap.xml`, and the contact route's origin allowlist.
 
 ## Scripts
 
 ```bash
-pnpm dev            # dev server (reads .env.local / process.env)
-pnpm dev:op         # dev server with 1Password Environment injection
-pnpm build          # next build (reads process.env as-is)
-pnpm build:vercel   # installs op, then op run --environment -- next build
+pnpm dev            # dev server, env from .env.local
+pnpm dev:op         # dev server, env from 1Password
+pnpm build          # next build
+pnpm build:vercel   # install the pinned op CLI, then build under op run
 pnpm test           # vitest
-pnpm lint           # eslint
-pnpm format         # prettier write
+pnpm lint           # eslint + markdownlint
+pnpm format         # prettier
 ```
 
-## Contact flow
+## Contact form
 
-`POST /api/contact` (Node.js runtime). The order matters and is deliberately cheap-first:
+`POST /api/contact` runs on the Node.js runtime and does the cheap checks first:
 
-1. Rejects requests from unexpected origins. The allowlist is `CANONICAL_ORIGIN`, `APEX_ORIGIN`, the current Vercel preview URL, and localhost outside production.
-2. Verifies the request with [Vercel BotID](https://vercel.com/docs/botid) (the [`botid`](https://www.npmjs.com/package/botid) package). BotID is wired through `src/instrumentation-client.ts` on the client and checked server-side before the route parses any body.
-3. Parses the JSON body and validates it with Zod. Honeypot hits return `200` silently so bots don't learn they were detected.
-4. Loads the contact mail config from 1Password Environments at runtime when `OP_SERVICE_ACCOUNT_TOKEN` and `OP_ENVIRONMENT_ID` are present, with a fail-fast timeout so contact submissions do not hang on a stalled secret lookup. Local development can fall back to direct env vars when those 1Password runtime settings are absent.
-5. Sends the message through [Resend](https://resend.com). `RESEND_FROM_EMAIL` must live on a domain verified in Resend. Provider errors are logged without message or stack in production.
-
-## Automation
-
-GitHub Actions runs CI on pushes and pull requests to `main`:
-
-- `pnpm lint`
-- `pnpm test`
-- `pnpm build`
-
-Dependabot checks weekly for npm and GitHub Actions updates.
-
-## Security
-
-See [SECURITY.md](./SECURITY.md) for the vulnerability-reporting policy and scope.
+1. Rejects unexpected origins. The canonical and apex origins and the current Vercel preview URL are allowed, plus localhost outside production.
+2. Verifies the request with [Vercel BotID](https://vercel.com/docs/botid) before reading the body. The client side is set up in `src/instrumentation-client.ts`.
+3. Validates the JSON body with Zod. Honeypot hits get a silent `200`.
+4. Loads the mail config from 1Password when `OP_SERVICE_ACCOUNT_TOKEN` and `OP_ENVIRONMENT_ID` are set, with a fail-fast timeout, and from plain env vars otherwise.
+5. Sends through [Resend](https://resend.com). In production, failures are logged without the error message or stack.
 
 ## Deployment
 
-Configured for Vercel deployment with `james.cadena.sh` as the canonical host. Traffic to the apex `cadena.sh` is 301'd to the canonical subdomain at the Next.js routing layer (`next.config.ts`).
+Vercel runs `pnpm build:vercel` (see `vercel.json`) and stores only two variables: `OP_SERVICE_ACCOUNT_TOKEN`, a service account token with read-only access to your Environment, and `OP_ENVIRONMENT_ID`.
 
-The Vercel build settings are source-controlled in `vercel.json`:
+- **Build:** `scripts/install-op.sh` downloads a pinned `op` CLI beta and checks it against a pinned per-platform SHA-256. If `OP_VERSION` changes without a verified `OP_SHA256`, the build fails closed. `next build` then runs under `op run --environment`.
+- **Runtime:** the contact route reads the same Environment with the `@1password/sdk` beta and caches it for the warm instance.
 
-- Build Command: `pnpm build:vercel`
-- Install Command: `pnpm install --frozen-lockfile`
+Both are betas because 1Password Environments are still in beta in the CLI and the SDK.
 
-The Vercel project stores only these environment variables:
+Requests to `cadena.sh` get a 301 to `james.cadena.sh` (`next.config.ts`). CI runs lint, tests, and a build on pushes and pull requests to `main`.
 
-- `OP_SERVICE_ACCOUNT_TOKEN`
-- `OP_ENVIRONMENT_ID`
+## Security
+
+Report vulnerabilities as described in [SECURITY.md](./SECURITY.md).
 
 ## License
 
