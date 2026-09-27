@@ -1,4 +1,4 @@
-import { isIP } from "node:net";
+import { BlockList, isIP } from "node:net";
 
 import { headers } from "next/headers";
 
@@ -30,6 +30,12 @@ function extractRegion(vercelId: string | null): string | null {
   return region || null;
 }
 
+// IPv4-mapped IPv6 lives in ::ffff:0:0/96. BlockList normalizes IPv6 before matching, so this catches
+// every spelling: dotted (::ffff:203.0.113.5), hex (::ffff:cb00:7105), and
+// fully expanded.
+const ipv4Mapped = new BlockList();
+ipv4Mapped.addSubnet("::ffff:0:0", 96, "ipv6");
+
 /**
  * Classifies the address the edge accepted the connection from. Only the
  * family leaves this function; the visitor's address is never echoed back.
@@ -52,7 +58,7 @@ function extractIpFamily(
     case 4:
       return "ipv4";
     case 6:
-      return /^::ffff:\d+\.\d+\.\d+\.\d+$/i.test(address) ? "ipv4" : "ipv6";
+      return ipv4Mapped.check(address, "ipv6") ? "ipv4" : "ipv6";
     default:
       return null;
   }

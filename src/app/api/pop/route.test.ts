@@ -46,10 +46,14 @@ describe("GET /api/pop", () => {
     );
   });
 
-  it("treats IPv4-mapped IPv6 as IPv4", async () => {
-    await expect(
-      getPop({ "x-real-ip": "::ffff:203.0.113.5" }),
-    ).resolves.toMatchObject({ ipFamily: "ipv4" });
+  it.each([
+    "::ffff:203.0.113.5",
+    "::FFFF:cb00:7105",
+    "0:0:0:0:0:ffff:cb00:7105",
+  ])("treats IPv4-mapped IPv6 (%s) as IPv4", async (address) => {
+    await expect(getPop({ "x-real-ip": address })).resolves.toMatchObject({
+      ipFamily: "ipv4",
+    });
   });
 
   it("falls back to the first x-forwarded-for hop", async () => {
