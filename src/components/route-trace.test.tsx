@@ -10,7 +10,12 @@ beforeEach(() => {
   vi.stubGlobal("fetch", fetchMock);
   fetchMock.mockResolvedValue(
     new Response(
-      JSON.stringify({ region: "yyz1", city: "Toronto", country: "CA" }),
+      JSON.stringify({
+        region: "yyz1",
+        city: "Toronto",
+        country: "CA",
+        ipFamily: "ipv4",
+      }),
       { status: 200 },
     ),
   );
@@ -52,7 +57,7 @@ describe("RouteTrace", () => {
     expect(hops[0]).toHaveTextContent("You");
     expect(hops[0]).toHaveTextContent("Toronto, CA");
     expect(hops[1]).toHaveTextContent("yyz1");
-    expect(hops[1]).toHaveTextContent("h3");
+    expect(hops[1]).toHaveTextContent("h3 · ipv4");
     expect(hops[2]).toHaveTextContent(window.location.host);
     expect(hops[2]).toHaveTextContent("23 ms");
   });
@@ -75,7 +80,9 @@ describe("RouteTrace", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole("button", { name: /served from yyz1 over h3 in 23/i }),
+        screen.getByRole("button", {
+          name: /served from yyz1 over h3 and ipv4 in 23/i,
+        }),
       ).toBeInTheDocument();
     });
 

@@ -25,6 +25,7 @@ beforeEach(() => {
         region: "iad1",
         city: "Ashburn",
         country: "US",
+        ipFamily: "ipv4",
       }),
       { status: 200 },
     ),
@@ -130,13 +131,14 @@ describe("PopChip", () => {
     await waitFor(() => {
       expect(
         screen.getByRole("button", {
-          name: /served from iad1 over h3 in 43 milliseconds/i,
+          name: /served from iad1 over h3 and ipv4 in 43 milliseconds/i,
         }),
       ).toBeInTheDocument();
     });
 
     expect(screen.getByText("iad1")).toBeInTheDocument();
     expect(screen.getByText("h3")).toBeInTheDocument();
+    expect(screen.getByText("ipv4")).toBeInTheDocument();
     expect(screen.getByText("43ms")).toBeInTheDocument();
   });
 
@@ -160,7 +162,12 @@ describe("PopChip", () => {
     expect(resolveFetch).toBeDefined();
     resolveFetch!(
       new Response(
-        JSON.stringify({ region: "iad1", city: null, country: null }),
+        JSON.stringify({
+          region: "iad1",
+          city: null,
+          country: null,
+          ipFamily: null,
+        }),
         { status: 200 },
       ),
     );
@@ -197,7 +204,12 @@ describe("PopChip", () => {
     nowSpy.mockReturnValue(175);
     resolveFetch!(
       new Response(
-        JSON.stringify({ region: "iad1", city: null, country: null }),
+        JSON.stringify({
+          region: "iad1",
+          city: null,
+          country: null,
+          ipFamily: null,
+        }),
         { status: 200 },
       ),
     );
@@ -235,6 +247,7 @@ describe("PopChip", () => {
     expect(panel).toHaveTextContent("Ashburn");
     expect(panel).toHaveTextContent("US");
     expect(panel).toHaveTextContent("iad1");
+    expect(panel).toHaveTextContent("IPipv4");
     expect(panel).toHaveTextContent("19ms");
 
     fireEvent.keyDown(document, { key: "Escape" });
@@ -302,6 +315,24 @@ describe("PopChip", () => {
       expect(trigger).toHaveAttribute("aria-expanded", "false");
     });
     expect(screen.queryByText("Ashburn")).not.toBeInTheDocument();
+  });
+
+  it("rejects a payload with an unknown IP family", async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          region: "iad1",
+          city: null,
+          country: null,
+          ipFamily: "203.0.113.5",
+        }),
+        { status: 200 },
+      ),
+    );
+
+    render(<PopChip />);
+
+    expect(await screen.findByText("unavailable")).toBeInTheDocument();
   });
 
   it("renders unavailable when the lookup fails", async () => {
