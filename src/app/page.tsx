@@ -4,6 +4,7 @@ import { ChainMark } from "@/components/chain-mark";
 import { ContactForm } from "@/components/contact-form";
 import { PopChip } from "@/components/pop-chip";
 import { RouteTrace } from "@/components/route-trace";
+import { SectionRail } from "@/components/section-rail";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Button } from "@/components/ui/button";
 import { SectionLabel, SectionMarker } from "@/components/ui/section";
@@ -49,7 +50,9 @@ function sectionIndex(id: string) {
 
 export default function Home() {
   return (
-    <div className="relative isolate flex min-h-screen flex-col overflow-x-hidden">
+    // `overflow-x-clip`, not `-hidden`: hidden turns this wrapper into a scroll
+    // container, which pins the sticky header to it instead of the viewport.
+    <div className="relative isolate flex min-h-screen flex-col overflow-x-clip">
       <a
         href="#main"
         className="sr-only z-50 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground focus:not-sr-only focus:fixed focus:top-4 focus:left-4"
@@ -66,7 +69,12 @@ export default function Home() {
         <div className="absolute -top-80 left-1/2 h-[48rem] w-[min(84rem,150vw)] -translate-x-1/2 bg-[radial-gradient(closest-side,var(--glow),transparent)]" />
       </div>
 
-      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur-md supports-[backdrop-filter]:bg-background/55">
+      {/* Sticky on phones. From md up it scrolls away and the section rail
+          docks the same links on the right edge. */}
+      <header
+        id="site-header"
+        className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur-md supports-[backdrop-filter]:bg-background/55 md:static"
+      >
         <div
           className={cn(
             shell,
@@ -107,6 +115,8 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      <SectionRail headerId="site-header" items={navItems} />
 
       <main id="main" className="flex-1">
         <section id="top" className={sectionScrollOffset}>
