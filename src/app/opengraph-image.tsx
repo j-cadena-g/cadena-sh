@@ -12,7 +12,7 @@ const FOREGROUND = "#f3f2ee";
 const MUTED = "#a3a19f";
 const FAINT = "#6f6c69";
 
-export const alt = "James Cadena — Network & Security Engineer";
+export const alt = "James Cadena — IT Infrastructure Analyst";
 export const size = {
   width: 1200,
   height: 630,
@@ -147,7 +147,7 @@ export default function OpenGraphImage() {
             }}
           >
             <div style={{ width: 40, height: 2, background: SIGNAL }} />
-            <span>NETWORK &amp; SECURITY ENGINEER</span>
+            <span>IT INFRASTRUCTURE ANALYST</span>
           </div>
         </div>
 
@@ -173,7 +173,7 @@ export default function OpenGraphImage() {
             />
           </div>
           <div style={{ display: "flex", fontSize: 36, color: MUTED }}>
-            Infrastructure across networks, systems, and security.
+            Enterprise networks, datacenters, and security.
           </div>
         </div>
 

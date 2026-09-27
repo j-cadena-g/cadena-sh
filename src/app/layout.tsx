@@ -36,14 +36,14 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(CANONICAL_ORIGIN),
-  title: "James Cadena | Network & Security Engineer",
-  description: "Networks, systems, security, and infrastructure tooling.",
+  title: "James Cadena | IT Infrastructure Analyst",
+  description: "Enterprise network architecture, security, and systems.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "James Cadena | Network & Security Engineer",
-    description: "Networks, systems, security, and infrastructure tooling.",
+    title: "James Cadena | IT Infrastructure Analyst",
+    description: "Enterprise network architecture, security, and systems.",
     images: [
       {
         url: socialImage,
@@ -57,8 +57,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "James Cadena | Network & Security Engineer",
-    description: "Networks, systems, security, and infrastructure tooling.",
+    title: "James Cadena | IT Infrastructure Analyst",
+    description: "Enterprise network architecture, security, and systems.",
     images: [socialImage],
   },
 };

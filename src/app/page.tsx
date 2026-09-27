@@ -113,7 +113,7 @@ export default function Home() {
           <div className={cn(shell, "pt-14 pb-16 sm:pt-20 sm:pb-20 lg:pt-24")}>
             <p className="flex items-center gap-3 font-mono text-[0.72rem] tracking-[0.16em] uppercase text-muted-foreground motion-safe:animate-rise">
               <span aria-hidden="true" className="h-px w-8 bg-primary" />
-              Network &amp; Security Engineer
+              IT Infrastructure Analyst
             </p>
             {/* Phones get the name on two larger lines; from sm up it fits on one. */}
             <h1 className="mt-6 font-heading text-[17vw] leading-[0.85] font-medium tracking-[-0.055em] text-foreground sm:text-[clamp(3.4rem,11.2vw,10.5rem)] motion-safe:animate-rise motion-safe:[animation-delay:80ms]">
@@ -132,12 +132,13 @@ export default function Home() {
             <div className="mt-12 grid gap-12 lg:mt-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,27rem)] lg:items-end lg:gap-16">
               <div className="flex flex-col gap-7 motion-safe:animate-rise motion-safe:[animation-delay:160ms]">
                 <p className="max-w-2xl font-heading text-2xl leading-[1.2] tracking-[-0.03em] text-foreground sm:text-[2rem]">
-                  Infrastructure across networks, systems, and security.
+                  Enterprise networks, datacenters, and the security around
+                  them.
                 </p>
                 <p className="max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
-                  I build and run infrastructure that has to stay secure,
-                  reliable, and usable in production. I keep the stack current
-                  without adding avoidable failure modes.
+                  I design and run the core network, firewalls, and datacenter
+                  infrastructure a business depends on, and keep them secure,
+                  reliable, and current without adding avoidable failure modes.
                 </p>
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-5 pt-1">
                   <div className="flex flex-wrap items-center gap-3">
@@ -293,7 +294,7 @@ export default function Home() {
             </SectionMarker>
             <div className="mt-10 grid gap-x-16 gap-y-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-end">
               <h2 className={cn(sectionHeading, "max-w-3xl")}>
-                Networks, systems, security, and delivery.
+                Networks, security, systems, and cloud.
               </h2>
               <p className="max-w-sm text-base leading-7 text-muted-foreground">
                 New tools when they fit the environment. Older ones when they
@@ -301,7 +302,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
               {capabilityGroups.map((group) => (
                 <section
                   key={group.id}
@@ -352,9 +353,10 @@ export default function Home() {
                   Practical infrastructure work.
                 </h2>
                 <p className="max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
-                  My background is in networks, systems, and security. I also
-                  build small APIs and deployment tooling where it makes the
-                  core work easier.
+                  Network architecture is where I am strongest, and security is
+                  where I am heading. Systems, storage, and identity work fill
+                  in the rest, with small tools built where they make the core
+                  work easier.
                 </p>
               </div>
 
@@ -380,12 +382,28 @@ export default function Home() {
                 <li className="relative">
                   <span
                     aria-hidden="true"
+                    className="absolute top-3 -bottom-[2.625rem] -left-[1.9375rem] w-px -translate-x-1/2 bg-linear-to-b from-primary/80 to-muted-foreground/30"
+                  />
+                  <span
+                    aria-hidden="true"
                     className="absolute top-0.5 -left-9 size-2.5 rounded-full bg-primary shadow-[0_0_0_4px_var(--glow)]"
                   />
                   <SectionLabel className="text-primary">Current</SectionLabel>
                   <p className="mt-3 text-base leading-7 text-foreground/90">
-                    Running production infrastructure and building the tooling
-                    that supports it.
+                    Focused on enterprise network architecture: the core
+                    network, Palo Alto firewalls, and the datacenter behind
+                    them.
+                  </p>
+                </li>
+                <li className="relative">
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-0.5 -left-9 size-2.5 rounded-full border-[1.5px] border-dashed border-primary/70 bg-background"
+                  />
+                  <SectionLabel>Next</SectionLabel>
+                  <p className="mt-3 text-base leading-7 text-muted-foreground">
+                    Moving deeper into security: architecture, governance, and
+                    risk.
                   </p>
                 </li>
               </ol>
@@ -407,10 +425,10 @@ export default function Home() {
                   Get in touch
                 </h2>
                 <p className="max-w-md text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
-                  If you are hiring for infrastructure, security, systems, or
-                  technical operations, feel free to get in touch — happy to
-                  share my resume and references on request. Not hiring? Still
-                  happy to talk tech and AI.
+                  If you are hiring for network, security, or infrastructure
+                  roles, feel free to get in touch — happy to share my resume
+                  and references on request. Not hiring? Still happy to talk
+                  tech and AI.
                 </p>
               </div>
               <ContactForm />
