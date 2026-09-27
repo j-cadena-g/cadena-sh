@@ -41,6 +41,10 @@ function buildDetailRows({
     rows.push({ label: "Proto", value: protocolLabel });
   }
 
+  if (data.ipFamily) {
+    rows.push({ label: "IP", value: data.ipFamily });
+  }
+
   rows.push({ label: "RTT", value: `${latencyMs}ms` });
 
   return rows;
@@ -132,8 +136,11 @@ export function PopChip({ className }: { className?: string }) {
     regionLabel,
   });
 
+  const transport = [protocolLabel, data.ipFamily]
+    .filter(Boolean)
+    .join(" and ");
   const ariaLabel = `Served from ${regionLabel}${
-    protocolLabel ? ` over ${protocolLabel}` : ""
+    transport ? ` over ${transport}` : ""
   } in ${latencyMs} milliseconds`;
 
   function toggleExpanded() {
@@ -168,6 +175,16 @@ export function PopChip({ className }: { className?: string }) {
             </span>
             <span className="motion-safe:animate-[pop-chip-ready_420ms_ease-out]">
               {protocolLabel}
+            </span>
+          </>
+        ) : null}
+        {data.ipFamily ? (
+          <>
+            <span aria-hidden="true" className="text-border">
+              ·
+            </span>
+            <span className="motion-safe:animate-[pop-chip-ready_420ms_ease-out]">
+              {data.ipFamily}
             </span>
           </>
         ) : null}

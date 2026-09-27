@@ -56,7 +56,10 @@ function buildHops(state: PopState): Hop[] {
       id: "edge",
       kind: "Edge POP",
       value: formatRegion(state.data.region),
-      detail: formatProtocol(state.protocol),
+      detail:
+        [formatProtocol(state.protocol), state.data.ipFamily]
+          .filter(Boolean)
+          .join(" · ") || null,
     },
     {
       id: "origin",

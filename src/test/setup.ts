@@ -33,7 +33,12 @@ beforeEach(() => {
     vi.fn(() =>
       Promise.resolve(
         new Response(
-          JSON.stringify({ region: "test-region", city: null, country: null }),
+          JSON.stringify({
+            region: "test-region",
+            city: null,
+            country: null,
+            ipFamily: null,
+          }),
           { status: 200 },
         ),
       ),

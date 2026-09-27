@@ -5,10 +5,14 @@ export const POP_ENDPOINT = "/api/pop";
 /** Abort the edge POP lookup if it hangs longer than this. */
 const POP_FETCH_TIMEOUT_MS = 10_000;
 
+export type IpFamily = "ipv4" | "ipv6";
+
 export type PopPayload = {
   region: string;
   city: string | null;
   country: string | null;
+  /** How the visitor reached the edge; the address itself is never sent. */
+  ipFamily: IpFamily | null;
 };
 
 export type PopResourceTiming = {
@@ -36,7 +40,10 @@ function isPopPayload(value: unknown): value is PopPayload {
   return (
     typeof payload.region === "string" &&
     (payload.city === null || typeof payload.city === "string") &&
-    (payload.country === null || typeof payload.country === "string")
+    (payload.country === null || typeof payload.country === "string") &&
+    (payload.ipFamily === null ||
+      payload.ipFamily === "ipv4" ||
+      payload.ipFamily === "ipv6")
   );
 }
 
