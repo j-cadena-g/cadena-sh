@@ -22,7 +22,9 @@ function buildCsp(nonce: string) {
     "connect-src 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
-    "upgrade-insecure-requests",
+    // Safari applies this to http://localhost too, which breaks every
+    // subresource when testing the dev server on an iPhone or the simulator.
+    ...(isDev ? [] : ["upgrade-insecure-requests"]),
   ].join("; ");
 }
 

@@ -50,9 +50,10 @@ function sectionIndex(id: string) {
 
 export default function Home() {
   return (
-    // `overflow-x-clip`, not `-hidden`: hidden turns this wrapper into a scroll
-    // container, which pins the sticky header to it instead of the viewport.
-    <div className="relative isolate flex min-h-screen flex-col overflow-x-clip">
+    // No overflow clipping here, not even `overflow-x-clip`: iOS Safari then
+    // repositions the sticky header a frame late, so it bounces while scrolling.
+    // Wide decorations clip themselves instead (see the backdrop below).
+    <div className="relative isolate flex min-h-screen flex-col">
       <a
         href="#main"
         className="sr-only z-50 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground focus:not-sr-only focus:fixed focus:top-4 focus:left-4"
