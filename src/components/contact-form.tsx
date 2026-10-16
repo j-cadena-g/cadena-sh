@@ -253,18 +253,22 @@ export function ContactForm() {
           </Field>
 
           {/* Honeypot: filled submissions are silently dropped by the API,
-              so keep it away from screen readers as well as the tab order. */}
-          <Field className="sr-only" aria-hidden="true">
-            <FieldLabel htmlFor="website">Website</FieldLabel>
-            <FieldContent>
-              <Input
-                id="website"
-                name="website"
-                tabIndex={-1}
-                autoComplete="off"
-              />
-            </FieldContent>
-          </Field>
+              so keep it away from screen readers as well as the tab order.
+              The wrapper carries `sr-only` because Field's own `w-full` would
+              override its 1px width and push the page wider than the screen. */}
+          <div className="sr-only" aria-hidden="true">
+            <Field>
+              <FieldLabel htmlFor="website">Website</FieldLabel>
+              <FieldContent>
+                <Input
+                  id="website"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+              </FieldContent>
+            </Field>
+          </div>
         </FieldGroup>
 
         {submissionState.status === "success" ? (

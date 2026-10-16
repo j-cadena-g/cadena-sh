@@ -28,4 +28,13 @@ describe("proxy CSP", () => {
 
     expect(csp).toContain("'unsafe-eval'");
   });
+
+  it("skips upgrade-insecure-requests in development", () => {
+    vi.stubEnv("NODE_ENV", "development");
+
+    const response = proxy(new NextRequest("http://localhost:3000/"));
+    const csp = response.headers.get("Content-Security-Policy");
+
+    expect(csp).not.toContain("upgrade-insecure-requests");
+  });
 });
