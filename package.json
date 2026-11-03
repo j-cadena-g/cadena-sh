@@ -45,7 +45,7 @@
     "@1password/sdk": "0.5.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
-    "botid": "^1.5.11",
+    "botid": "^1.5.12",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.56.0",
